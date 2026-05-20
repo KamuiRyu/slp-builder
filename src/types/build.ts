@@ -1,0 +1,32 @@
+import type { Attributes, TrainingAttributes } from './attributes'
+
+export type Build = {
+  name: string
+  rankId: string
+  lineageId: string
+  elementIds: [string, string?]
+  attributes: Attributes
+  training: TrainingAttributes
+  equipments: {
+    weaponId?: string
+    armorId?: string
+    accessoryId?: string
+    ninjaToolId?: string
+  }
+  selectedSkills: {
+    lineageSkillIds: string[]
+    elementalSkillIds: string[]
+    buffSkillIds: string[]
+  }
+  skillLevels: Record<string, number>
+}
+
+export type Lineage = {
+  id: string
+  name: string
+}
+
+export type Element = {
+  id: string
+  name: string
+}
