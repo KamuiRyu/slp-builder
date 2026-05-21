@@ -1,4 +1,4 @@
-# SLP Builder
+# SLP Forge
 
 Builder frontend para montar, calcular e compartilhar builds de shinobi.
 

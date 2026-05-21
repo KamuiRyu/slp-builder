@@ -14,6 +14,7 @@ import {
 import { BuildPreview } from '../components/BuildPreview'
 import { BuilderForm } from '../components/BuilderForm'
 import { BuildLibrary } from '../components/BuildLibrary'
+import { BrandLogo } from '../components/BrandLogo'
 import {
   INITIAL_ATTRIBUTE_POINTS,
   INITIAL_TRAINING_POINTS,
@@ -165,7 +166,9 @@ export function BuilderPage() {
     <main className="app-shell">
       <section className="hero-section">
         <div className="hero-copy">
-          <h1>SLP Builder</h1>
+          <h1>
+            <BrandLogo />
+          </h1>
           <p>Monte seu shinobi</p>
         </div>
       </section>

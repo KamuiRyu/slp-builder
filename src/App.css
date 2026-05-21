@@ -70,12 +70,20 @@
   animation: title-in 420ms ease-out both;
   margin: 0;
   color: var(--text-strong);
-  font-family: var(--display);
-  font-size: clamp(4.6rem, 8.2vw, 7.4rem);
-  font-weight: 900;
-  letter-spacing: 0;
   line-height: 0.82;
-  text-transform: none;
+}
+
+.brand-logo {
+  display: inline-grid;
+  place-items: center;
+  max-width: 100%;
+}
+
+.brand-logo-image {
+  display: block;
+  width: min(520px, 88vw);
+  height: auto;
+  filter: drop-shadow(0 0 28px rgba(113, 92, 255, 0.22));
 }
 
 .hero-copy p {
@@ -1514,7 +1522,12 @@ small,
   }
 
   .hero-copy h1 {
-    font-size: clamp(3.3rem, 18vw, 4.7rem);
+    display: grid;
+    place-items: center;
+  }
+
+  .brand-logo {
+    width: 100%;
   }
 
   .form-card,
