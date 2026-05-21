@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Copy, ScrollText, Swords } from 'lucide-react'
+import { ScrollText, Swords } from 'lucide-react'
 import { AttributeIcon } from './AttributeIcon'
 import { ATTRIBUTE_LABELS, TRAINABLE_ATTRIBUTES } from '../types/attributes'
 import type { Attributes } from '../types/attributes'
@@ -32,8 +32,6 @@ export function BuildPreview({
   maxAttributePoints,
   maxTrainableAttributePoints,
   damageSkills,
-  shareUrl,
-  onCopyShareUrl,
 }: BuildPreviewProps) {
   const distributedPoints = calculateDistributedPoints(build.attributes)
   const isOverLimit = distributedPoints > maxAttributePoints
