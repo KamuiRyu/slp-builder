@@ -843,22 +843,6 @@ export const ELEMENTAL_SKILLS: Record<string, ElementalSkill[]> = {
 export const BUFF_SKILLS: BuffSkill[] = []
 
 export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
-  uchiha: [
-    {
-      id: 'sharingan-focus',
-      name: 'Foco Sharingan',
-      imageSrc: '/images/elementals/unknown.png',
-      description: 'Refina percepção e controle de genjutsu.',
-      effects: [
-        {
-          type: 'buff',
-          name: 'Leitura de movimento',
-          description: 'Aumenta Genjutsu em percentual.',
-          percentStats: { genjutsu: 10 },
-        },
-      ],
-    },
-  ],
   hyuuga_souke: [
     {
       id: 'byakugan-focus',

@@ -157,12 +157,6 @@ export function BuildPreview({
           ))
         )}
       </section>
-
-      <button className="share-button" type="button" onClick={onCopyShareUrl}>
-        <Copy aria-hidden="true" />
-        Copiar link da build
-      </button>
-      <p className="share-url">{shareUrl}</p>
     </aside>
   )
 }
