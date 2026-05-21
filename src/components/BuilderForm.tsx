@@ -30,6 +30,7 @@ import {
   calculateDistributedPoints,
   convertAttributePointsToStat,
 } from '../utils/stats'
+import { getPublicAssetUrl } from '../utils/assets'
 
 type BuilderFormProps = {
   build: Build
@@ -292,7 +293,9 @@ export function BuilderForm({
                       alt=""
                       className="active-skill-image"
                       loading="lazy"
-                      src={skill.imageSrc ?? UNKNOWN_SKILL_IMAGE}
+                      src={getPublicAssetUrl(
+                        skill.imageSrc ?? UNKNOWN_SKILL_IMAGE,
+                      )}
                     />
                     <span>
                       <strong>{skill.name}</strong>

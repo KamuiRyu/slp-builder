@@ -5,6 +5,7 @@ import { ATTRIBUTE_LABELS, TRAINABLE_ATTRIBUTES } from '../types/attributes'
 import type { Attributes } from '../types/attributes'
 import type { Build } from '../types/build'
 import type { DamageSkill, SkillEffect } from '../types/skill'
+import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
 import { calculateDistributedPoints } from '../utils/stats'
 
@@ -122,7 +123,9 @@ export function BuildPreview({
                     alt=""
                     className="skill-image"
                     loading="lazy"
-                    src={skill.imageSrc ?? UNKNOWN_SKILL_IMAGE}
+                    src={getPublicAssetUrl(
+                      skill.imageSrc ?? UNKNOWN_SKILL_IMAGE,
+                    )}
                   />
                   <div>
                     <strong>{skill.name}</strong>
