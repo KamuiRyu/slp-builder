@@ -287,7 +287,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'suna-no-kouken',
       name: 'Suna no Kouken',
-      description: 'Envia braços de areia que perseguem e causam atordoamento (stun) no inimigo.',
+      description: 'Envia braços de areia que causam atordoamento (stun) no inimigo.',
       imageSrc: '/images/lineages/sabaku-1.png',
       baseDamage: 50,
       scalingAttribute: 'ninjutsu',
@@ -306,9 +306,9 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       name: 'Suna no Tate',
       description: 'Cria uma defesa absoluta de areia ao seu redor. Concede imunidade a dano e controle de grupo enquanto durar o chakra. Consome chakra passivamente por segundo e sofre redução de chakra ao receber golpes.',
       imageSrc: '/images/lineages/sabaku-2.png',
-      baseDamage: 100,
+      baseDamage: 0,
       scalingAttribute: 'ninjutsu',
-      scalingPercent: 0.4,
+      scalingPercent: 0,
       effects: [
         {
           type: 'buff',
