@@ -16,6 +16,19 @@ export function calculateDistributedPoints(attributes: Attributes): number {
   )
 }
 
+export function convertAttributePointsToStat(
+  attribute: keyof Attributes,
+  value: number,
+): number {
+  const multiplier = VITAL_ATTRIBUTES.includes(
+    attribute as (typeof VITAL_ATTRIBUTES)[number],
+  )
+    ? 10
+    : 1
+
+  return value * multiplier
+}
+
 export function calculateFinalStats(
   build: Build,
   rank: NinjaRank,
@@ -28,13 +41,10 @@ export function calculateFinalStats(
   for (const attribute of Object.keys(build.attributes) as Array<
     keyof Attributes
   >) {
-    const multiplier = VITAL_ATTRIBUTES.includes(
-      attribute as (typeof VITAL_ATTRIBUTES)[number],
+    stats[attribute] += convertAttributePointsToStat(
+      attribute,
+      build.attributes[attribute],
     )
-      ? 10
-      : 1
-
-    stats[attribute] += build.attributes[attribute] * multiplier
   }
 
   for (const attribute of TRAINABLE_ATTRIBUTES) {
@@ -52,7 +62,8 @@ export function calculateFinalStats(
     }
 
     for (const [attribute, value] of Object.entries(equipment.stats)) {
-      stats[attribute as keyof Attributes] += value ?? 0
+      const key = attribute as keyof Attributes
+      stats[key] += convertAttributePointsToStat(key, value ?? 0)
     }
   }
 

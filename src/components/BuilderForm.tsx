@@ -26,7 +26,10 @@ import type { Build } from '../types/build'
 import type { Equipment, EquipmentType } from '../types/equipment'
 import type { BuffSkill } from '../types/skill'
 import type { BuildFormValues } from '../utils/validation'
-import { calculateDistributedPoints } from '../utils/stats'
+import {
+  calculateDistributedPoints,
+  convertAttributePointsToStat,
+} from '../utils/stats'
 
 type BuilderFormProps = {
   build: Build
@@ -112,7 +115,8 @@ export function BuilderForm({
     .reduce(
       (bonuses, equipment) => {
         for (const [attribute, value] of Object.entries(equipment.stats ?? {})) {
-          bonuses[attribute as AttributeKey] += value ?? 0
+          const key = attribute as AttributeKey
+          bonuses[key] += convertAttributePointsToStat(key, value ?? 0)
         }
 
         return bonuses
@@ -381,7 +385,10 @@ export function BuilderForm({
                 onUpdate={updateAttributeValue}
                 register={registerClampedNumber(field, maxValue)}
                 sideValue={equipmentBonuses[attribute]}
-                totalValue={currentValue + equipmentBonuses[attribute]}
+                totalValue={
+                  convertAttributePointsToStat(attribute, currentValue) +
+                  equipmentBonuses[attribute]
+                }
               />
             )
           })}

@@ -105,8 +105,15 @@
   align-items: start;
 }
 
+.builder-sidebar {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
 .form-card,
-.preview-panel {
+.preview-panel,
+.saved-builds-card {
   animation: rise-in 420ms ease-out both;
   position: relative;
   overflow: hidden;
@@ -122,13 +129,15 @@
 }
 
 .form-card:hover,
-.preview-panel:hover {
+.preview-panel:hover,
+.saved-builds-card:hover {
   border-color: #30323a;
   transform: translateY(-2px);
 }
 
 .form-card::before,
-.preview-panel::before {
+.preview-panel::before,
+.saved-builds-card::before {
   position: absolute;
   top: 38px;
   left: 30px;
@@ -143,14 +152,16 @@
 }
 
 .form-card:hover::before,
-.preview-panel:hover::before {
+.preview-panel:hover::before,
+.saved-builds-card:hover::before {
   top: 34px;
   height: 32px;
   box-shadow: 0 0 18px currentColor;
 }
 
 .builder-form .form-card:nth-child(2)::before,
-.preview-panel::before {
+.preview-panel::before,
+.saved-builds-card::before {
   background: var(--cyan);
 }
 
@@ -167,7 +178,8 @@
 }
 
 .form-card h2,
-.preview-panel h2 {
+.preview-panel h2,
+.saved-builds-card h2 {
   margin: 0 0 26px;
   padding-left: 16px;
   color: var(--text-strong);
@@ -178,6 +190,147 @@
   line-height: 1;
   text-transform: uppercase;
   text-shadow: 1px 1px 0 rgba(0, 98, 255, 0.55);
+}
+
+.build-library {
+  display: grid;
+  gap: 14px;
+  max-width: 1540px;
+  margin: 28px auto 0;
+}
+
+.library-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.library-actions button,
+.saved-build-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--field);
+  color: var(--text-strong);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  padding: 10px 12px;
+  text-transform: uppercase;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.library-actions button:hover,
+.saved-build-row button:hover {
+  border-color: var(--cyan);
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+
+.library-actions .primary-action {
+  border-color: rgba(113, 92, 255, 0.72);
+  background: var(--violet);
+  color: white;
+}
+
+.library-actions .primary-action:hover {
+  border-color: var(--violet);
+  box-shadow: 0 0 18px rgba(113, 92, 255, 0.22);
+}
+
+.library-actions svg,
+.saved-build-row svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.saved-build-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.saved-build-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 38px;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--border-soft);
+  background: var(--field);
+  padding: 12px;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.saved-build-row:hover {
+  border-color: #353844;
+  background: var(--surface-2);
+  transform: translateX(2px);
+}
+
+.saved-build-row div {
+  display: grid;
+  gap: 4px;
+}
+
+.saved-build-row strong {
+  overflow: hidden;
+  color: var(--text-strong);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.saved-build-row span,
+.library-current {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.saved-build-row .icon-action {
+  width: 38px;
+  min-height: 38px;
+  padding: 0;
+}
+
+.saved-build-row .icon-action:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.library-empty {
+  margin: -10px 0 0;
+  line-height: 1.6;
+}
+
+.library-current {
+  margin: 16px 0 0;
+}
+
+.library-current strong {
+  color: var(--text-strong);
 }
 
 .form-note {
@@ -1376,7 +1529,8 @@ small,
   }
 
   .field-grid,
-  .stat-grid {
+  .stat-grid,
+  .library-actions {
     grid-template-columns: 1fr;
   }
 

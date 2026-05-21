@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { ELEMENTS } from '../config/elements'
 import { EQUIPMENTS } from '../config/equipments'
@@ -12,12 +13,18 @@ import {
 } from '../config/skills'
 import { BuildPreview } from '../components/BuildPreview'
 import { BuilderForm } from '../components/BuilderForm'
+import { BuildLibrary } from '../components/BuildLibrary'
 import {
   INITIAL_ATTRIBUTE_POINTS,
   INITIAL_TRAINING_POINTS,
 } from '../types/attributes'
 import type { Build } from '../types/build'
-import { createShareUrl, readSharedBuild } from '../utils/share'
+import {
+  createSavedBuild,
+  readSavedBuilds,
+  writeSavedBuilds,
+} from '../utils/localBuilds'
+import { createShareUrl, encodeBuild, readSharedBuild } from '../utils/share'
 import { calculateFinalStats } from '../utils/stats'
 import { buildSchema, type BuildFormValues } from '../utils/validation'
 
@@ -88,6 +95,12 @@ function normalizeBuild(build: LegacyPersistedBuild): Build {
 }
 
 export function BuilderPage() {
+  const [savedBuilds, setSavedBuilds] = useState(() =>
+    readSavedBuilds().map((savedBuild) => ({
+      ...savedBuild,
+      build: normalizeBuild(savedBuild.build),
+    })),
+  )
   const form = useForm<BuildFormValues>({
     resolver: zodResolver(buildSchema),
     mode: 'onChange',
@@ -121,6 +134,33 @@ export function BuilderPage() {
     await navigator.clipboard.writeText(shareUrl)
   }
 
+  async function copyBuildData() {
+    await navigator.clipboard.writeText(encodeBuild(build))
+  }
+
+  function saveCurrentBuild() {
+    const nextSavedBuilds = [
+      createSavedBuild(normalizeBuild(build)),
+      ...savedBuilds,
+    ]
+
+    setSavedBuilds(nextSavedBuilds)
+    writeSavedBuilds(nextSavedBuilds)
+  }
+
+  function loadSavedBuild(savedBuild: Build) {
+    form.reset(normalizeBuild(savedBuild))
+  }
+
+  function deleteSavedBuild(buildId: string) {
+    const nextSavedBuilds = savedBuilds.filter(
+      (savedBuild) => savedBuild.id !== buildId,
+    )
+
+    setSavedBuilds(nextSavedBuilds)
+    writeSavedBuilds(nextSavedBuilds)
+  }
+
   return (
     <main className="app-shell">
       <section className="hero-section">
@@ -142,16 +182,30 @@ export function BuilderPage() {
           register={form.register}
           setValue={form.setValue}
         />
-        <BuildPreview
-          build={build}
-          damageSkills={activeDamageSkills}
-          finalStats={finalStats}
-          maxAttributePoints={activeRank.maxAttributePoints}
-          maxTrainableAttributePoints={activeRank.maxTrainableAttributePoints}
-          onCopyShareUrl={copyShareUrl}
-          shareUrl={shareUrl}
-        />
+        <div className="builder-sidebar">
+          <BuildPreview
+            build={build}
+            damageSkills={activeDamageSkills}
+            finalStats={finalStats}
+            maxAttributePoints={activeRank.maxAttributePoints}
+            maxTrainableAttributePoints={activeRank.maxTrainableAttributePoints}
+            onCopyShareUrl={copyShareUrl}
+            shareUrl={shareUrl}
+          />
+        </div>
       </div>
+
+      <BuildLibrary
+        build={build}
+        lineages={LINEAGES}
+        onCopyBuildData={copyBuildData}
+        onCopyShareUrl={copyShareUrl}
+        onDeleteBuild={deleteSavedBuild}
+        onLoadBuild={loadSavedBuild}
+        onSaveBuild={saveCurrentBuild}
+        ranks={NINJA_RANKS}
+        savedBuilds={savedBuilds}
+      />
     </main>
   )
 }
