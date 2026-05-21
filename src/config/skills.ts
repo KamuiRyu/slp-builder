@@ -7,6 +7,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       name: 'Sharingan Dousatsugan',
       description: 'Ativa a percepção do Sharingan para antecipar o movimento inimigo e evitar o primeiro golpe recebido.',
       baseDamage: 0,
+      imageSrc: '/images/lineages/uchiha-1.png',
       scalingAttribute: 'genjutsu',
       scalingPercent: 0,
       effects: [
@@ -22,6 +23,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       name: 'Sharingan Copiador',
       description: 'Analisa os selos e o fluxo de chakra do adversário para copiar o último jutsu elemental utilizado por ele.',
       baseDamage: 0,
+      imageSrc: '/images/lineages/uchiha-2.png',
       scalingAttribute: 'genjutsu',
       scalingPercent: 0,
       effects: [
@@ -37,6 +39,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       name: 'Magen: Tsukuyomi',
       description: 'Prende o alvo em um genjutsu superior, suspendendo-o no ar e mergulhando sua mente no Tsukuyomi para causar dano e interromper suas ações.',
       baseDamage: 150,
+      imageSrc: '/images/lineages/uchiha-3.png',
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
       effects: [
