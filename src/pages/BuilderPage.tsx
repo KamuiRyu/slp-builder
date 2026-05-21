@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { CSSProperties } from 'react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { ELEMENTS } from '../config/elements'
@@ -25,6 +26,7 @@ import {
   readSavedBuilds,
   writeSavedBuilds,
 } from '../utils/localBuilds'
+import { getPublicAssetUrl } from '../utils/assets'
 import { createShareUrl, encodeBuild, readSharedBuild } from '../utils/share'
 import { calculateFinalStats } from '../utils/stats'
 import { buildSchema, type BuildFormValues } from '../utils/validation'
@@ -96,6 +98,12 @@ function normalizeBuild(build: LegacyPersistedBuild): Build {
 }
 
 export function BuilderPage() {
+  const appBackgroundStyle = {
+    '--app-background-image': `url("${getPublicAssetUrl(
+      '/images/background.png',
+    )}")`,
+  } as CSSProperties
+
   const [savedBuilds, setSavedBuilds] = useState(() =>
     readSavedBuilds().map((savedBuild) => ({
       ...savedBuild,
@@ -163,7 +171,7 @@ export function BuilderPage() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" style={appBackgroundStyle}>
       <section className="hero-section">
         <div className="hero-copy">
           <h1>
