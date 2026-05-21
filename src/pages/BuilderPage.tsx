@@ -59,7 +59,8 @@ function normalizeElementIds(build: LegacyPersistedBuild): [string, string?] {
 
 function normalizeBuild(build: LegacyPersistedBuild): Build {
   const elementIds = normalizeElementIds(build)
-  const { elementId: _legacyElementId, ...buildWithoutLegacyElementId } = build
+  const buildWithoutLegacyElementId = { ...build }
+  delete buildWithoutLegacyElementId.elementId
 
   return {
     ...DEFAULT_BUILD,
@@ -143,7 +144,6 @@ export function BuilderPage() {
         />
         <BuildPreview
           build={build}
-          buffSkills={availableBuffSkills}
           damageSkills={activeDamageSkills}
           finalStats={finalStats}
           maxAttributePoints={activeRank.maxAttributePoints}

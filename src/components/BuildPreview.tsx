@@ -4,7 +4,7 @@ import { AttributeIcon } from './AttributeIcon'
 import { ATTRIBUTE_LABELS, TRAINABLE_ATTRIBUTES } from '../types/attributes'
 import type { Attributes } from '../types/attributes'
 import type { Build } from '../types/build'
-import type { BuffSkill, DamageSkill, SkillEffect } from '../types/skill'
+import type { DamageSkill, SkillEffect } from '../types/skill'
 import { calculateDamage } from '../utils/damage'
 import { calculateDistributedPoints } from '../utils/stats'
 
@@ -22,7 +22,6 @@ type BuildPreviewProps = {
   maxAttributePoints: number
   maxTrainableAttributePoints: number
   damageSkills: DamageSkill[]
-  buffSkills: BuffSkill[]
   shareUrl: string
   onCopyShareUrl: () => void
 }
@@ -33,7 +32,6 @@ export function BuildPreview({
   maxAttributePoints,
   maxTrainableAttributePoints,
   damageSkills,
-  buffSkills,
   shareUrl,
   onCopyShareUrl,
 }: BuildPreviewProps) {
@@ -109,34 +107,6 @@ export function BuildPreview({
           ),
         )}
       </div>
-
-      {buffSkills.length > 0 && (
-        <section className="buff-list">
-          <h3>Buffs</h3>
-          {buffSkills.map((skill) => (
-            <article key={skill.id}>
-              <div className="skill-info">
-                <img
-                  alt=""
-                  className="skill-image"
-                  loading="lazy"
-                  src={skill.imageSrc ?? UNKNOWN_SKILL_IMAGE}
-                />
-                <div>
-                  <strong>{skill.name}</strong>
-                </div>
-              </div>
-              {(skill.description || (skill.effects && skill.effects.length > 0)) && (
-                <SkillDetails
-                  description={skill.description}
-                  effects={skill.effects}
-                  skillId={skill.id}
-                />
-              )}
-            </article>
-          ))}
-        </section>
-      )}
 
       <section className="damage-list">
         <div className="section-title">
@@ -262,6 +232,9 @@ function SkillEffects({ effects, skillId }: SkillEffectsProps) {
                 <li key={level.level}>
                   <b>Nv. {level.level}</b>
                   <span>{level.description}</span>
+                  {level.duration && (
+                    <em>Duração: {level.duration}</em>
+                  )}
                   <EffectStats
                     percentStats={level.percentStats}
                     stats={level.stats}

@@ -9,6 +9,7 @@ export type SkillEffectLevel = {
   description: string
   stats?: Partial<Attributes>
   percentStats?: Partial<Attributes>
+  duration?: string
 }
 
 export type SkillEffect = {

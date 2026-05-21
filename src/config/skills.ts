@@ -5,26 +5,48 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'sharingan-dousatsugan',
       name: 'Sharingan Dousatsugan',
-      description: 'Aguça a percepção e prevê os movimentos do adversário.',
-      baseDamage: 50,
+      description: 'Ativa a percepção do Sharingan para antecipar o movimento inimigo e evitar o primeiro golpe recebido.',
+      baseDamage: 0,
       scalingAttribute: 'genjutsu',
-      scalingPercent: 0.4,
+      scalingPercent: 0,
+      effects: [
+        {
+          type: 'special',
+          name: 'Previsão de Movimento',
+          description: 'Evita completamente o primeiro hit que atingiria o usuário após a ativação.',
+        },
+      ],
     },
     {
       id: 'sharingan-copiador',
       name: 'Sharingan Copiador',
-      description: 'Analisa e replica as técnicas do inimigo em combate.',
-      baseDamage: 100,
+      description: 'Analisa os selos e o fluxo de chakra do adversário para copiar o último jutsu elemental utilizado por ele.',
+      baseDamage: 0,
       scalingAttribute: 'genjutsu',
-      scalingPercent: 0.4,
+      scalingPercent: 0,
+      effects: [
+        {
+          type: 'special',
+          name: 'Cópia Elemental',
+          description: 'Replica o último jutsu elemental lançado pelo inimigo, respeitando as condições de uso da técnica copiada.',
+        },
+      ],
     },
     {
       id: 'magen-kasegui',
-      name: 'Magen: Kasegui',
-      description: 'Ilusão de aprisionamento por estacas que restringe as ações do alvo.',
+      name: 'Magen: Tsukuyomi',
+      description: 'Prende o alvo em um genjutsu superior, suspendendo-o no ar e mergulhando sua mente no Tsukuyomi para causar dano e interromper suas ações.',
       baseDamage: 150,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
+      effects: [
+        {
+          type: 'debuff',
+          name: 'Aprisionamento Ilusório',
+          description: 'Levanta o alvo e o mantém preso na ilusão, impedindo reação durante a execução.',
+          duration: '2s',
+        },
+      ],
     },
   ],
   uzumaki: [
@@ -128,7 +150,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'byakugan-juuken-souke',
       name: 'Byakugan: Juuken',
       description: 'Desperta o Byakugan, garantindo percepção total do campo de batalha. Amplifica o Taijutsu em 10% e permite drenar o chakra inimigo através do Juuken, consumindo o chakra do usuário passivamente por segundo. Pode ativar a visão para enxergar tudo ao redor.',
-      imageSrc: '/images/elementals/unknown.png',
+      imageSrc: '/images/lineages/hyuuga-1.png',
       baseDamage: 0,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0,
@@ -143,8 +165,8 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     },
     {
       id: 'hakke-kuuhekishou',
-      name: 'Hakke Kuuhekishou',
-      description: 'Parede de vácuo disparada pelas palmas das mãos.',
+      name: 'Hakke Kuushou: Vacuum Palm',
+      description: 'Concentra chakra nas palmas e dispara uma rajada de vácuo em linha reta, atingindo o inimigo à distância com um impacto preciso do Juuken.',
       baseDamage: 100,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
@@ -152,10 +174,23 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'juuho-soushiken',
       name: 'Juuho Soushiken',
-      description: 'Passo gentil dos punhos de leões gêmeos.',
+      description: 'Envolve os punhos com chakra em forma de leões gêmeos, fortalecendo o Juuken e aumentando o Taijutsu em 39%. A energia também pode ser lançada contra o inimigo para causar dano direto.',
       baseDamage: 150,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
+      effects: [
+        {
+          type: 'buff',
+          name: 'Punhos dos Leões Gêmeos',
+          description: 'Aumenta o Taijutsu do usuário em 39% enquanto os punhos estiverem envoltos pela técnica.',
+          percentStats: { taijutsu: 39 },
+        },
+        {
+          type: 'special',
+          name: 'Disparo de Chakra',
+          description: 'Permite lançar a energia dos leões gêmeos para atingir o alvo à distância.',
+        },
+      ],
     },
   ],
   hyuuga_bunke: [
@@ -163,7 +198,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'byakugan-juuken-bouke',
       name: 'Byakugan: Juuken',
       description: 'Desperta o Byakugan, garantindo percepção total do campo de batalha. Amplifica o Taijutsu em 10% e permite drenar o chakra inimigo através do Juuken, consumindo o chakra do usuário passivamente por segundo. Pode ativar a visão para enxergar tudo ao redor.',
-      imageSrc: '/images/elementals/unknown.png',
+      imageSrc: '/images/lineages/hyuuga-1.png',
       baseDamage: 0,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0,
@@ -179,24 +214,17 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'hakkeshou-kaiten',
       name: 'Hakkeshou Kaiten',
-      description: 'Libera uma quantidade massiva de chakra por todos os tenketsu do corpo enquanto gira rapidamente, criando uma barreira giratória impenetrável que causa dano a todos os inimigos ao redor.',
-      imageSrc: '/images/elementals/unknown.png',
+      description: 'Libera uma quantidade massiva de chakra por todos os tenketsu do corpo enquanto gira rapidamente, criando uma barreira giratória impenetrável que causa dano aos inimigos próximos e os repele com a força do impacto.',
+      imageSrc: '/images/lineages/hyuuga-b-2.png',
       baseDamage: 100,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
-      effects: [
-        {
-          type: 'buff',
-          name: 'Barreira Giratória',
-          description: 'Repele projéteis, ataques físicos e causa dano em área aos oponentes próximos.',
-        },
-      ],
     },
     {
-      id: 'hakke-sanjuu-ni-shou',
-      name: 'Hakke Sanjuu Ni Shou',
+      id: 'juuho-soushiken',
+      name: 'Juuho Soushiken',
       description: 'Executa uma sequência veloz e implacável de 32 golpes nos pontos de chakra (tenketsu) dos oponentes em área, causando dano massivo.',
-      imageSrc: '/images/elementals/unknown.png',
+      imageSrc: '/images/lineages/hyuuga-b-3.png',
       baseDamage: 150,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
@@ -303,7 +331,8 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'dainamikku-entori',
       name: 'Dainamikku Entori',
-      description: 'Entrada dinâmica com chute surpresa de grande impacto.',
+      description: 'Avança em alta velocidade com um chute frontal explosivo, ideal para iniciar combate e romper a guarda do alvo.',
+      imageSrc: '/images/lineages/lotus-1.png',
       baseDamage: 50,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
@@ -311,18 +340,79 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'konoha-shoufuu',
       name: 'Konoha Shoufuu',
-      description: 'Vendaval da folha que arremessa o oponente para o alto.',
+      description: 'Executa um chute ascendente rápido que intercepta o inimigo e o lança para cima.',
+      imageSrc: '/images/lineages/lotus-2.png',
       baseDamage: 100,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
+      effects: [
+        {
+          type: 'debuff',
+          name: 'Levantamento (Knockup)',
+          description: 'Arremessa o oponente para o alto, interrompendo ações e abrindo espaço para combos.',
+        },
+      ],
     },
     {
       id: 'hachimon-tonkou',
       name: 'Hachimon Tonkou',
-      description: 'Liberação de limitadores de energia para amplificação física.',
-      baseDamage: 150,
+      description: 'Liberação progressiva dos portões internos para amplificar o desempenho físico. Cada portão desbloqueado aumenta o Taijutsu em percentual. O usuário pode escolher o nível ativo dos portões para aplicar os bônus correspondentes.',
+      imageSrc: '/images/lineages/lotus-3.png',
+      baseDamage: 0,
       scalingAttribute: 'taijutsu',
-      scalingPercent: 0.4,
+      scalingPercent: 0,
+      effects: [
+        {
+          type: 'buff',
+          name: 'Portões internos',
+          description: 'Escolha o nível ativo para aplicar os bônus.',
+
+          levels: [
+            {
+              level: 1,
+              label: '1º Portão',
+              description: 'Aumenta o Taijutsu em 6.5%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 6.5 },
+            },
+            {
+              level: 2,
+              label: '2º Portão',
+              description: 'Aumenta o Taijutsu em 13%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 13 },
+            },
+            {
+              level: 3,
+              label: '3º Portão',
+              description: 'Aumenta o Taijutsu em 19.5%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 19.5 },
+            },
+            {
+              level: 4,
+              label: '4º Portão',
+              description: 'Aumenta o Taijutsu em 26%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 26 },
+            },
+            {
+              level: 5,
+              label: '5º Portão',
+              description: 'Aumenta o Taijutsu em 32.5%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 32.5 },
+            },
+            {
+              level: 6,
+              label: '6º Portão',
+              description: 'Aumenta o Taijutsu em 39%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 39 },
+            }
+          ],
+        },
+      ],
     },
   ],
   yuuhi: [
@@ -355,26 +445,46 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'kirigakure-no-jutsu',
       name: 'Kirigakure no Jutsu',
-      description: 'Ocultação na névoa densa para preparar investidas furtivas.',
-      baseDamage: 50,
+      description: 'Espalha uma névoa densa no campo de batalha e se oculta dentro dela. A técnica consome chakra continuamente enquanto estiver ativa e termina quando o chakra acaba, quando o usuário sai da área da névoa ou ao realizar o primeiro ataque.',
+      baseDamage: 0,
       scalingAttribute: 'kenjutsu',
-      scalingPercent: 0.4,
+      scalingPercent: 0,
+      effects: [
+        {
+          type: 'special',
+          name: 'Ocultação na Névoa',
+          description: 'O usuário permanece oculto dentro da área da névoa enquanto sustenta o consumo contínuo de chakra.',
+        },
+        {
+          type: 'debuff',
+          name: 'Visibilidade Reduzida',
+          description: 'Inimigos dentro da névoa têm dificuldade para localizar o usuário e reagir ao primeiro ataque.',
+        },
+      ],
     },
     {
       id: 'sairento-kiringu',
       name: 'Sairento Kiringu',
-      description: 'Ataque surpresa letal executado em silêncio absoluto.',
+      description: 'Avança rapidamente contra o inimigo e desfere uma espadada precisa, aproveitando aberturas criadas pela névoa ou pela aproximação silenciosa.',
       baseDamage: 100,
       scalingAttribute: 'kenjutsu',
       scalingPercent: 0.4,
     },
     {
-      id: 'kijingiri-sakki',
-      name: 'Kijingiri: Sakki',
-      description: 'Corte devastador com a lâmina decapitadora imbuída de intenção assassina.',
-      baseDamage: 150,
+      id: 'sakki',
+      name: 'Sakki',
+      description: 'Envolve o usuário em uma aura demoníaca de pura intenção assassina, pressionando os inimigos próximos e elevando drasticamente sua habilidade com espada.',
+      baseDamage: 0,
       scalingAttribute: 'kenjutsu',
-      scalingPercent: 0.4,
+      scalingPercent: 0,
+      effects: [
+        {
+          type: 'buff',
+          name: 'Aura Demoníaca',
+          description: 'Aumenta o Kenjutsu do usuário em 30%.',
+          percentStats: { kenjutsu: 30 },
+        },
+      ],
     },
   ],
 }
@@ -631,15 +741,59 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
       ],
     },
   ],
-  hyuuga_souke: [],
-  hyuuga_bunke: [],
+  hyuuga_souke: [
+    {
+      id: 'byakugan-focus',
+      name: 'Foco Byakugan',
+      imageSrc: '/images/lineages/hyuuga-1.png',
+      description: 'Refina percepção e controle de taijutsu.',
+      effects: [
+        {
+          type: 'buff',
+          name: 'Leitura de movimento',
+          description: 'Aumenta Taijutsu em percentual.',
+          percentStats: { taijutsu: 10 },
+        },
+      ],
+    },
+    {
+      id: 'juuho-soushiken',
+      name: 'Juuho Soushiken',
+      imageSrc: '/images/lineages/hyuuga-1.png',
+      description: 'Punhos revestidos por chakra que amplificam o Juuken.',
+      effects: [
+        {
+          type: 'buff',
+          name: 'Punhos dos Leões Gêmeos',
+          description: 'Aumenta o Taijutsu do usuário em 39%.',
+          percentStats: { taijutsu: 39 },
+        },
+      ],
+    },
+  ],
+  hyuuga_bunke: [
+    {
+      id: 'byakugan-focus',
+      name: 'Foco Byakugan',
+      imageSrc: '/images/lineages/hyuuga-1.png',
+      description: 'Refina percepção e controle de taijutsu.',
+      effects: [
+        {
+          type: 'buff',
+          name: 'Leitura de movimento',
+          description: 'Aumenta Taijutsu em percentual.',
+          percentStats: { taijutsu: 10 },
+        },
+      ],
+    }
+  ],
 
   lotus: [
     {
       id: 'lotus-gates',
-      name: 'Portões do Lótus',
-      imageSrc: '/images/elementals/unknown.png',
-      description: 'Liberação progressiva que aumenta o poder físico.',
+      name: 'Hachimon Tonkou',
+      imageSrc: '/images/lineages/lotus-3.png',
+      description: 'Liberação progressiva dos portões internos para amplificar o desempenho físico.',
       effects: [
         {
           type: 'buff',
@@ -649,22 +803,46 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
             {
               level: 1,
               label: '1º Portão',
-              description: '+10 Taijutsu.',
-              stats: { taijutsu: 10 },
+              description: 'Aumenta o Taijutsu em 6.5%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 6.5 },
             },
             {
               level: 2,
               label: '2º Portão',
-              description: '+20 Taijutsu.',
-              stats: { taijutsu: 20 },
+              description: 'Aumenta o Taijutsu em 13%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 13 },
             },
             {
               level: 3,
               label: '3º Portão',
-              description: '+35 Taijutsu e -50 Vida.',
-              stats: { taijutsu: 35, vida: -50 },
+              description: 'Aumenta o Taijutsu em 19.5%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 19.5 },
             },
-          ],
+            {
+              level: 4,
+              label: '4º Portão',
+              description: 'Aumenta o Taijutsu em 26%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 26 },
+            },
+            {
+              level: 5,
+              label: '5º Portão',
+              description: 'Aumenta o Taijutsu em 32.5%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 32.5 },
+            },
+            {
+              level: 6,
+              label: '6º Portão',
+              description: 'Aumenta o Taijutsu em 39%.',
+              duration: '1min30s',
+              percentStats: { taijutsu: 39 },
+            }
+          ]
         },
       ],
     },
@@ -687,16 +865,16 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
   ],
   momochi: [
     {
-      id: 'silent-assassin',
-      name: 'Assassino Silencioso',
+      id: 'sakki',
+      name: 'Sakki',
       imageSrc: '/images/elementals/unknown.png',
-      description: 'Técnica silenciosa que amplia a letalidade de cortes com espada.',
+      description: 'Aura demoníaca que amplifica a pressão assassina e a técnica de espada.',
       effects: [
         {
           type: 'buff',
-          name: 'Corte Letal',
-          description: 'Aumenta a efetividade de kenjutsus.',
-          percentStats: { kenjutsu: 12 },
+          name: 'Aura Demoníaca',
+          description: 'Aumenta o Kenjutsu do usuário em 30%.',
+          percentStats: { kenjutsu: 30 },
         },
       ],
     },

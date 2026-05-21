@@ -2,51 +2,28 @@ import type { Equipment } from '../types/equipment'
 
 export const EQUIPMENTS: Equipment[] = [
   {
-    id: 'kunai-balanced',
-    name: 'Kunai Balanceada',
-    type: 'weapon',
-    stats: { taijutsu: 20 },
-  },
-  {
-    id: 'chakra-blade',
-    name: 'Lâmina de Chakra',
-    type: 'weapon',
-    stats: { kenjutsu: 25 },
-  },
-  {
-    id: 'flak-jacket',
-    name: 'Colete Shinobi',
+    id: 'chunnin-jacket',
+    name: 'Colete Chunnin',
     type: 'armor',
-    stats: { vida: 120 },
+    stats: { vida: 100, chakra: 120},
   },
+
   {
-    id: 'chakra-cloak',
-    name: 'Manto de Chakra',
-    type: 'armor',
-    stats: { chakra: 120 },
-  },
-  {
-    id: 'focus-seal',
-    name: 'Selo de Foco',
+    id: 'bandana',
+    name: 'Bandana',
     type: 'accessory',
-    stats: { ninjutsu: 20, genjutsu: 15 },
+    stats: { vida: 50, chakra: 30 },
   },
   {
-    id: 'wind-bell',
-    name: 'Sino de Vento',
+    id: 'akatsuki-hat',
+    name: 'Chapéu de Akatsuki',
     type: 'accessory',
-    stats: { chakra: 60 },
+    stats: { vida: 100, chakra: 100 },
   },
   {
-    id: 'smoke-bomb',
-    name: 'Bomba de Fumaça',
-    type: 'ninjaTool',
-    stats: { genjutsu: 15 },
-  },
-  {
-    id: 'paper-bomb',
-    name: 'Papel Bomba',
-    type: 'ninjaTool',
-    stats: { ninjutsu: 15 },
+    id: 'kage-hat',
+    name: 'Chapéu de Kage',
+    type: 'accessory',
+    stats: { vida: 500, chakra: 500 },
   },
 ]
