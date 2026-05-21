@@ -419,15 +419,22 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'magen-jubaku-satsu',
       name: 'Magen: Jubaku Satsu',
-      description: 'Ilusão demoníaca que prende o alvo em uma árvore ilusória.',
+      description: 'Invoca um clone formado por pétalas que avança contra o inimigo. Ao tocar o alvo, o clone explode em uma rajada ilusória e o lança para cima.',
       baseDamage: 50,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
+      effects: [
+        {
+          type: 'debuff',
+          name: 'Levantamento (Knockup)',
+          description: 'O inimigo é lançado para o alto, interrompendo suas ações e deixando-o vulnerável a ataques subsequentes.',
+        }
+      ]
     },
     {
       id: 'magen-hanagasumi',
       name: 'Magen: Hanagasumi',
-      description: 'Ilusão de pétalas de flores dispersas para desorientação.',
+      description: 'Conjura pétalas de flores e as dispara contra o inimigo causando dano direto.',
       baseDamage: 100,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
@@ -435,10 +442,17 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'magen-sanshin',
       name: 'Magen: Sanshin',
-      description: 'Ilusão tripla que confunde os sentidos e percepções do oponente.',
+      description: 'Cria uma nuvem de pétalas ao redor do usuário e a detona em seguida, atingindo inimigos próximos e lançando-os para cima.',
       baseDamage: 150,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
+      effects: [
+        {
+          type: 'debuff',
+          name: 'Levantamento (Knockup)',
+          description: 'O inimigo é lançado para o alto, interrompendo suas ações e deixando-o vulnerável a ataques subsequentes.',
+        }
+      ]
     },
   ],
   momochi: [
@@ -945,22 +959,6 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
               percentStats: { taijutsu: 39 },
             }
           ]
-        },
-      ],
-    },
-  ],
-  yuuhi: [
-    {
-      id: 'illusion-mastery',
-      name: 'Domínio Ilusório',
-      imageSrc: '/images/elementals/unknown.png',
-      description: 'Percepção artística avançada e dispersão ilusória.',
-      effects: [
-        {
-          type: 'buff',
-          name: 'Arte da ilusão',
-          description: 'Aumenta a efetividade de genjutsus.',
-          percentStats: { genjutsu: 12 },
         },
       ],
     },
