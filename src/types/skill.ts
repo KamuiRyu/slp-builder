@@ -32,7 +32,7 @@ export type LineageSkill = {
   imageSrc?: string
   baseDamage: number
   scalingAttribute: ScalableAttributeKey
-  scalingPercent: 0.4
+  scalingPercent: 0 | 0.4
 } & SkillMetadata
 
 export type ElementalSkill = {

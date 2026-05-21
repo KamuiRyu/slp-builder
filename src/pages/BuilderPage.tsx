@@ -103,13 +103,11 @@ export function BuilderPage() {
   const elementalSkills = activeElementIds.flatMap(
     (elementId) => ELEMENTAL_SKILLS[elementId] ?? [],
   )
+  const activeDamageSkills = [...lineageSkills, ...elementalSkills]
   const availableBuffSkills = [
     ...BUFF_SKILLS,
     ...(LINEAGE_BUFF_SKILLS[build.lineageId] ?? []),
   ]
-  const selectedBuffSkills = availableBuffSkills.filter((skill) =>
-    build.selectedSkills.buffSkillIds.includes(skill.id),
-  )
   const finalStats = calculateFinalStats(
     build,
     activeRank,
@@ -145,8 +143,8 @@ export function BuilderPage() {
         />
         <BuildPreview
           build={build}
-          buffSkills={selectedBuffSkills}
-          damageSkills={[...lineageSkills, ...elementalSkills]}
+          buffSkills={availableBuffSkills}
+          damageSkills={activeDamageSkills}
           finalStats={finalStats}
           maxAttributePoints={activeRank.maxAttributePoints}
           maxTrainableAttributePoints={activeRank.maxTrainableAttributePoints}

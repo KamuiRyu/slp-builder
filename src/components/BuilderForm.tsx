@@ -303,6 +303,7 @@ export function BuilderForm({
                       <SelectTrigger
                         className="skill-level-select"
                         onClick={(event) => event.stopPropagation()}
+                        onPointerDown={(event) => event.stopPropagation()}
                       >
                         <SelectValue placeholder="Nível" />
                       </SelectTrigger>

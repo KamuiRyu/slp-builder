@@ -110,6 +110,34 @@ export function BuildPreview({
         )}
       </div>
 
+      {buffSkills.length > 0 && (
+        <section className="buff-list">
+          <h3>Buffs</h3>
+          {buffSkills.map((skill) => (
+            <article key={skill.id}>
+              <div className="skill-info">
+                <img
+                  alt=""
+                  className="skill-image"
+                  loading="lazy"
+                  src={skill.imageSrc ?? UNKNOWN_SKILL_IMAGE}
+                />
+                <div>
+                  <strong>{skill.name}</strong>
+                </div>
+              </div>
+              {(skill.description || (skill.effects && skill.effects.length > 0)) && (
+                <SkillDetails
+                  description={skill.description}
+                  effects={skill.effects}
+                  skillId={skill.id}
+                />
+              )}
+            </article>
+          ))}
+        </section>
+      )}
+
       <section className="damage-list">
         <div className="section-title">
           <Swords aria-hidden="true" />
@@ -130,10 +158,12 @@ export function BuildPreview({
                   />
                   <div>
                     <strong>{skill.name}</strong>
-                    <span>
-                      {skill.baseDamage} + {skill.scalingPercent * 100}%{' '}
-                      {ATTRIBUTE_LABELS[skill.scalingAttribute]}
-                    </span>
+                    {skill.baseDamage > 0 && (
+                      <span>
+                        {skill.baseDamage} + {skill.scalingPercent * 100}%{' '}
+                        {ATTRIBUTE_LABELS[skill.scalingAttribute]}
+                      </span>
+                    )}
                   </div>
                 </div>
                 {(skill.description || skill.effects?.length) && (
@@ -143,43 +173,20 @@ export function BuildPreview({
                     skillId={skill.id}
                   />
                 )}
-                <output>
-                  {calculateDamage(
-                    skill.baseDamage,
-                    finalStats[skill.scalingAttribute],
-                    skill.scalingPercent,
-                  )}
-                </output>
+                {skill.baseDamage > 0 && (
+                  <output>
+                    {calculateDamage(
+                      skill.baseDamage,
+                      finalStats[skill.scalingAttribute],
+                      skill.scalingPercent,
+                    )}
+                  </output>
+                )}
               </div>
             </article>
           ))
         )}
       </section>
-
-      {buffSkills.length > 0 && (
-        <section className="buff-list">
-          <h3>Bônus</h3>
-          {buffSkills.map((skill) => (
-            <article key={skill.id}>
-              <div className="skill-info">
-                <img
-                  alt=""
-                  className="skill-image"
-                  loading="lazy"
-                  src={skill.imageSrc ?? UNKNOWN_SKILL_IMAGE}
-                />
-                <div>
-                  <strong>{skill.name}</strong>
-                  <span>{skill.description}</span>
-                </div>
-              </div>
-              {skill.effects && skill.effects.length > 0 && (
-                <SkillDetails effects={skill.effects} skillId={skill.id} />
-              )}
-            </article>
-          ))}
-        </section>
-      )}
 
       <button className="share-button" type="button" onClick={onCopyShareUrl}>
         <Copy aria-hidden="true" />

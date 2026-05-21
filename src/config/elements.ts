@@ -6,11 +6,19 @@ export const ELEMENTS: Element[] = [
     name: 'Katon',
   },
   {
-    id: 'water',
-    name: 'Suiton',
+    id: 'wind',
+    name: 'Fuuton',
   },
   {
     id: 'lightning',
     name: 'Raiton',
+  },
+  {
+    id: 'water',
+    name: 'Suiton',
+  },
+  {
+    id: 'earth',
+    name: 'Doton',
   },
 ]
