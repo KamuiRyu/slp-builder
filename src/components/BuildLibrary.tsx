@@ -4,7 +4,6 @@ import {
   Clipboard,
   Database,
   Download,
-  Image,
   Link,
   Save,
   Trash2,
@@ -12,6 +11,7 @@ import {
   X,
   AlertCircle,
   Info,
+  Share2,
 } from 'lucide-react'
 import { toPng } from 'html-to-image'
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
@@ -59,11 +59,11 @@ const equipmentFields: Array<{
   type: EquipmentType
   field: keyof Build['equipments']
 }> = [
-  { type: 'weapon', field: 'weaponId' },
-  { type: 'armor', field: 'armorId' },
-  { type: 'accessory', field: 'accessoryId' },
-  { type: 'ninjaTool', field: 'ninjaToolId' },
-]
+    { type: 'weapon', field: 'weaponId' },
+    { type: 'armor', field: 'armorId' },
+    { type: 'accessory', field: 'accessoryId' },
+    { type: 'ninjaTool', field: 'ninjaToolId' },
+  ]
 
 const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
 
@@ -124,7 +124,7 @@ export function BuildLibrary({
     type?: 'success' | 'info' | 'error' | 'delete'
   } | null>(null)
   const [previewScale, setPreviewScale] = useState(1)
-  
+
   const shareCardRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const toastTimeoutRef = useRef<number | undefined>(undefined)
@@ -152,15 +152,15 @@ export function BuildLibrary({
     }
 
     const rafId = requestAnimationFrame(updateScale)
-    
+
     const observer = new ResizeObserver(() => {
       updateScale()
     })
-    
+
     if (stageRef.current) {
       observer.observe(stageRef.current)
     }
-    
+
     window.addEventListener('resize', updateScale)
 
     return () => {
@@ -174,9 +174,8 @@ export function BuildLibrary({
     const rank = ranks.find((item) => item.id === savedBuild.rankId)
     const lineage = lineages.find((item) => item.id === savedBuild.lineageId)
 
-    return `${rank?.name ?? savedBuild.rankId} / ${
-      lineage?.name ?? savedBuild.lineageId
-    }`
+    return `${rank?.name ?? savedBuild.rankId} / ${lineage?.name ?? savedBuild.lineageId
+      }`
   }
 
   function showToast(title: string, description: string, type: 'success' | 'info' | 'error' | 'delete' = 'success') {
@@ -273,17 +272,9 @@ export function BuildLibrary({
             Builds
             <span>{savedBuilds.length}</span>
           </button>
-          <button type="button" onClick={copyBuildData}>
-            <Clipboard aria-hidden="true" />
-            Dados
-          </button>
-          <button type="button" onClick={copyShareUrl}>
-            <Link aria-hidden="true" />
-            Link
-          </button>
           <button type="button" onClick={() => setIsShareOpen(true)}>
-            <Image aria-hidden="true" />
-            Imagem
+            <Share2 aria-hidden="true" />
+            Compartilhar
           </button>
         </div>
       </section>
@@ -354,7 +345,7 @@ export function BuildLibrary({
                     <div className="build-info">
                       <strong>{savedBuild.name}</strong>
                       <span>{getBuildSummary(savedBuild.build)}</span>
-                      
+
                       <div className="mini-stats-grid">
                         {DISTRIBUTABLE_ATTRIBUTES.map((attr) => {
                           const val = savedBuild.build.attributes[attr] || 0
@@ -363,7 +354,7 @@ export function BuildLibrary({
                             : 0
                           const total = val + trained
                           if (total === 0) return null
-                          
+
                           const color = attributeColors[attr]
                           return (
                             <div key={attr} className="mini-stat-bar-container" style={{ '--attr-color': color } as CSSProperties}>
@@ -476,6 +467,14 @@ export function BuildLibrary({
             </div>
 
             <div className="share-modal-actions">
+              <button type="button" onClick={copyBuildData}>
+                <Clipboard aria-hidden="true" />
+                Copiar dados
+              </button>
+              <button type="button" onClick={copyShareUrl}>
+                <Link aria-hidden="true" />
+                Copiar link
+              </button>
               <button
                 className="primary-action"
                 disabled={isGeneratingImage}
@@ -534,6 +533,7 @@ function BuildShareCard({
   const lineage = lineages.find((item) => item.id === build.lineageId)
   const element = elements.find((item) => item.id === build.elementIds[0])
   const selectedEquipments = equipmentFields.map(({ type, field }) => ({
+    type,
     label: equipmentLabels[type],
     equipment: equipments.find((item) => item.id === build.equipments[field]),
   }))
@@ -587,12 +587,14 @@ function BuildShareCard({
         <section className="share-equipment-panel">
           <span className="share-card-title">Equipamentos</span>
           <div className="share-equipment-list">
-            {selectedEquipments.map(({ label, equipment }) => (
-              <div className="share-equipment" key={label}>
-                <img
-                  alt=""
-                  src={getPublicAssetUrl(equipment?.imageSrc ?? UNKNOWN_IMAGE)}
-                />
+            {selectedEquipments.map(({ type, label, equipment }) => (
+              <div className={`share-equipment slot-${type}`} key={label}>
+                <div className="share-equipment-img-wrap">
+                  <img
+                    alt=""
+                    src={getPublicAssetUrl(equipment?.imageSrc ?? UNKNOWN_IMAGE)}
+                  />
+                </div>
                 <span>
                   <small>{label}</small>
                   <strong>{equipment?.name ?? 'Nenhum'}</strong>
@@ -612,10 +614,10 @@ function BuildShareCard({
                 const damage =
                   skill.baseDamage > 0
                     ? calculateDamage(
-                        skill.baseDamage,
-                        finalStats[skill.scalingAttribute],
-                        skill.scalingPercent,
-                      )
+                      skill.baseDamage,
+                      finalStats[skill.scalingAttribute],
+                      skill.scalingPercent,
+                    )
                     : null
                 const skillColor = SKILL_ATTRIBUTE_COLORS[skill.scalingAttribute]
                 const attrLabel = SKILL_ATTRIBUTE_LABELS[skill.scalingAttribute]
@@ -659,7 +661,7 @@ function BuildShareCard({
 
       <div className="share-card-footer">
         <span>SLP Forge Build</span>
-        <span>Build ID: local / Criado em Shinobi Builder</span>
+        <span>Build ID: local / Criado em SLP Forge</span>
       </div>
     </div>
   )
@@ -689,14 +691,18 @@ function ShareAttributeTable({
     <div className="share-attribute-table">
       <div className="share-attribute-table-head">
         <span>Atributo</span>
-        <span>Distribuído</span>
-        <span>Treinável</span>
-        <span>Equip.</span>
+        <span className="text-center">Distribuído</span>
+        <span className="text-center">Treinável</span>
+        <span className="text-center">Equip.</span>
       </div>
       {DISTRIBUTABLE_ATTRIBUTES.map((attribute) => {
         const isTrainable = TRAINABLE_ATTRIBUTES.includes(
           attribute as (typeof TRAINABLE_ATTRIBUTES)[number],
         )
+        const trained = isTrainable
+          ? training[attribute as (typeof TRAINABLE_ATTRIBUTES)[number]] || 0
+          : 0
+        const total = distributed[attribute] + trained
 
         return (
           <div
@@ -706,20 +712,24 @@ function ShareAttributeTable({
               '--attribute-color': attributeColors[attribute],
             } as CSSProperties}
           >
-            <span className="share-attribute-name">
-              <AttributeIcon
-                attribute={attribute}
-                className="share-attribute-icon"
-              />
-              {ATTRIBUTE_LABELS[attribute]}
-            </span>
+            <div className="share-attribute-info-cell">
+              <span className="share-attribute-name">
+                <AttributeIcon
+                  attribute={attribute}
+                  className="share-attribute-icon"
+                />
+                {ATTRIBUTE_LABELS[attribute]}
+              </span>
+              <div className="share-attribute-progress-outer">
+                <div
+                  className="share-attribute-progress-inner"
+                  style={{ width: `${Math.min(100, (total / 125) * 100)}%` }}
+                />
+              </div>
+            </div>
             <span className="share-attribute-box">{distributed[attribute]}</span>
-            <span className="share-attribute-side">
-              {isTrainable
-                ? training[attribute as (typeof TRAINABLE_ATTRIBUTES)[number]]
-                : 0}
-            </span>
-            <b>{equipmentBonuses[attribute]}</b>
+            <span className="share-attribute-side">{trained}</span>
+            <b className="share-attribute-equip">+{equipmentBonuses[attribute]}</b>
           </div>
         )
       })}
@@ -734,12 +744,12 @@ type ShareAttributeRadarProps = {
 
 function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
   const axes = [
-    { color: '#6ee77f', key: 'vida',      shortLabel: 'Vida',   fullLabel: 'Vida'      },
-    { color: '#5bd9e6', key: 'chakra',    shortLabel: 'Cha',    fullLabel: 'Chakra'    },
-    { color: '#4aa3ff', key: 'ninjutsu',  shortLabel: 'Nin',    fullLabel: 'Ninjutsu'  },
-    { color: '#ffd747', key: 'kenjutsu',  shortLabel: 'Ken',    fullLabel: 'Kenjutsu'  },
-    { color: '#a56cff', key: 'genjutsu',  shortLabel: 'Gen',    fullLabel: 'Genjutsu'  },
-    { color: '#ff4d5f', key: 'taijutsu',  shortLabel: 'Tai',    fullLabel: 'Taijutsu'  },
+    { color: 'var(--theme-accent, #ffd747)', key: 'vida', shortLabel: 'Vida', fullLabel: 'Vida' },
+    { color: 'var(--theme-accent, #ffd747)', key: 'chakra', shortLabel: 'Cha', fullLabel: 'Chakra' },
+    { color: 'var(--theme-accent, #ffd747)', key: 'ninjutsu', shortLabel: 'Nin', fullLabel: 'Ninjutsu' },
+    { color: 'var(--theme-accent, #ffd747)', key: 'kenjutsu', shortLabel: 'Ken', fullLabel: 'Kenjutsu' },
+    { color: 'var(--theme-accent, #ffd747)', key: 'genjutsu', shortLabel: 'Gen', fullLabel: 'Genjutsu' },
+    { color: 'var(--theme-accent, #ffd747)', key: 'taijutsu', shortLabel: 'Tai', fullLabel: 'Taijutsu' },
   ] as const
 
   const cx = 200
@@ -816,11 +826,11 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          {/* Gradient radial misturando várias cores */}
+          {/* Gradient radial usando a cor padrão do projeto */}
           <radialGradient id="radar-fill" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(255,176,0,0.35)" />
-            <stop offset="60%" stopColor="rgba(113,92,255,0.18)" />
-            <stop offset="100%" stopColor="rgba(255,64,87,0.06)" />
+            <stop offset="0%" stopColor="var(--theme-accent, #ffd747)" stopOpacity={0.35} />
+            <stop offset="60%" stopColor="var(--theme-accent, #ffd747)" stopOpacity={0.18} />
+            <stop offset="100%" stopColor="var(--theme-accent, #ffd747)" stopOpacity={0.06} />
           </radialGradient>
           {/* Glow individual para cada eixo */}
           {computedAxes.map((axis) => (
@@ -837,6 +847,7 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
         {/* Anéis de grid com opacidade variável */}
         {rings.map((scale) => (
           <polygon
+            className="radar-grid-ring"
             fill={scale === 1 ? 'rgba(255,255,255,0.03)' : 'none'}
             key={scale}
             points={ringPoints(scale)}
@@ -849,6 +860,7 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
         {/* Linhas guia do centro até a borda externa em cada eixo */}
         {computedAxes.map((axis) => (
           <line
+            className="radar-guide-line"
             key={`guide-${axis.key}`}
             stroke="rgba(198,202,211,0.18)"
             strokeWidth={1}
@@ -861,10 +873,11 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
 
         {/* Polígono de stats com fill gradiente + glow */}
         <polygon
+          className="radar-polygon"
           fill="url(#radar-fill)"
           filter="url(#radar-glow)"
           points={statPolygonPoints}
-          stroke="rgba(255,220,80,0.9)"
+          stroke="var(--theme-accent, #ffd747)"
           strokeLinejoin="round"
           strokeWidth={2}
         />
@@ -872,6 +885,8 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
         {/* Linhas coloridas do centro até o ponto de stat */}
         {computedAxes.map((axis) => (
           <line
+            className="radar-stat-line"
+            data-axis={axis.key}
             key={`line-${axis.key}`}
             opacity={0.25 + axis.ratio * 0.75}
             stroke={axis.color}
@@ -897,9 +912,10 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
 
         {/* Ponto de stat com duplo anel + glow */}
         {computedAxes.map((axis) => (
-          <g key={`dot-${axis.key}`} filter={`url(#dot-glow-${axis.key})`}>
+          <g key={`dot-${axis.key}`} filter={`url(#dot-glow-${axis.key})`} data-axis={axis.key}>
             {/* Anel externo suave */}
             <circle
+              className="radar-dot-ring"
               cx={axis.statPoint.x}
               cy={axis.statPoint.y}
               fill="none"
@@ -910,6 +926,7 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
             />
             {/* Ponto central sólido */}
             <circle
+              className="radar-dot-center"
               cx={axis.statPoint.x}
               cy={axis.statPoint.y}
               fill={axis.color}
@@ -923,30 +940,32 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
 
         {/* Labels nos eixos com nome + valor total */}
         {computedAxes.map((axis) => (
-          <g key={`label-${axis.key}`}>
+          <g key={`label-${axis.key}`} data-axis={axis.key}>
             <text
+              className="radar-label-name"
               dominantBaseline="central"
               fill={axis.color}
               fontFamily="Arial, Helvetica, sans-serif"
-              fontSize={11}
+              fontSize={14}
               fontWeight={900}
               opacity={0.5 + axis.ratio * 0.5}
               textAnchor={axis.textAnchor}
               x={axis.labelPoint.x}
-              y={axis.labelPoint.y - 7}
+              y={axis.labelPoint.y - 9}
             >
               {axis.shortLabel}
             </text>
             <text
+              className="radar-label-value"
               dominantBaseline="central"
               fill="rgba(255,255,255,0.7)"
               fontFamily="Arial, Helvetica, sans-serif"
-              fontSize={13}
+              fontSize={16}
               fontWeight={950}
               opacity={0.4 + axis.ratio * 0.6}
               textAnchor={axis.textAnchor}
               x={axis.labelPoint.x}
-              y={axis.labelPoint.y + 7}
+              y={axis.labelPoint.y + 9}
             >
               {axis.raw}
             </text>

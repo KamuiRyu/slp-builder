@@ -362,6 +362,8 @@ export function BuilderForm({
                 maxValue={maxValue}
                 onUpdate={updateAttributeValue}
                 register={registerClampedNumber(field, maxValue)}
+                showMax={true}
+                hideSideValue={true}
               />
             )
           })}
@@ -507,6 +509,8 @@ type AttributeRowProps = {
   register: UseFormRegisterReturn
   sideValue?: number
   totalValue?: number
+  showMax?: boolean
+  hideSideValue?: boolean
 }
 
 function AttributeRow({
@@ -519,14 +523,16 @@ function AttributeRow({
   register,
   sideValue = 0,
   totalValue = currentValue,
+  showMax = false,
+  hideSideValue = false,
 }: AttributeRowProps) {
   return (
-    <div className="attribute-row">
+    <div className={`attribute-row ${showMax ? 'has-max-row' : ''}`}>
       <span className="attribute-name">
         <AttributeIcon attribute={attribute} className="attribute-icon" />
         {label}
       </span>
-      <div className="attribute-stepper">
+      <div className={`attribute-stepper ${showMax ? 'has-max' : ''}`}>
         <button
           aria-label={`Diminuir ${label}`}
           disabled={currentValue <= 0}
@@ -552,8 +558,23 @@ function AttributeRow({
         >
           +
         </button>
+        {showMax && (
+          <button
+            className="btn-max"
+            aria-label={`Maximizar ${label}`}
+            disabled={currentValue >= maxValue}
+            onClick={() => onUpdate(field, maxValue, maxValue)}
+            type="button"
+          >
+            MAX
+          </button>
+        )}
       </div>
-      <span className="attribute-base">{sideValue}</span>
+      {hideSideValue ? (
+        <span className="attribute-base" />
+      ) : (
+        <span className="attribute-base">{sideValue}</span>
+      )}
       <output className="attribute-total">{totalValue}</output>
     </div>
   )
