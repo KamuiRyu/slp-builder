@@ -461,6 +461,7 @@ export function BuildLibrary({
                     lineages={lineages}
                     cardRef={shareCardRef}
                     theme={activeCardTheme}
+                    ranks={ranks}
                   />
                 </div>
               </div>
@@ -518,6 +519,7 @@ type BuildShareCardProps = {
   finalStats: Attributes
   lineages: Lineage[]
   theme: string
+  ranks: Array<{ id: string; name: string }>
 }
 
 function BuildShareCard({
@@ -529,9 +531,11 @@ function BuildShareCard({
   finalStats,
   lineages,
   theme,
+  ranks,
 }: BuildShareCardProps) {
   const lineage = lineages.find((item) => item.id === build.lineageId)
   const element = elements.find((item) => item.id === build.elementIds[0])
+  const rank = ranks.find((item) => item.id === build.rankId)
   const selectedEquipments = equipmentFields.map(({ type, field }) => ({
     type,
     label: equipmentLabels[type],
@@ -565,9 +569,14 @@ function BuildShareCard({
       <div className="share-card-header">
         <BrandLogo />
         <div className="share-card-meta">
-          <strong>{build.name || 'Shinobi sem nome'}</strong>
-          <ShareImage imageSrc={lineage?.imageSrc} label="Linhagem" />
-          <ShareImage imageSrc={element?.imageSrc} label="Elemento" />
+          <div className="share-card-name-block">
+            <div className="share-card-name-row">
+              <strong>{build.name || 'Shinobi sem nome'}</strong>
+              <ShareImage imageSrc={lineage?.imageSrc} label="Linhagem" />
+              <ShareImage imageSrc={element?.imageSrc} label="Elemento" />
+            </div>
+            <span className="share-card-rank">{rank?.name ?? 'Graduação'}</span>
+          </div>
         </div>
         <div className="share-radar-card">
           <ShareAttributeRadar points={build.attributes} training={build.training} />
@@ -987,9 +996,8 @@ type ShareImageProps = {
 
 function ShareImage({ imageSrc, label }: ShareImageProps) {
   return (
-    <div className="share-origin-image">
-      <img alt="" src={getPublicAssetUrl(imageSrc ?? UNKNOWN_IMAGE)} />
-      <span>{label}</span>
+    <div className="share-origin-image" title={label}>
+      <img alt={label} src={getPublicAssetUrl(imageSrc ?? UNKNOWN_IMAGE)} />
     </div>
   )
 }
