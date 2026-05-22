@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ScrollText, Swords } from 'lucide-react'
 import { AttributeIcon } from './AttributeIcon'
 import { ATTRIBUTE_LABELS, TRAINABLE_ATTRIBUTES } from '../types/attributes'
@@ -152,86 +152,105 @@ export function BuildPreview({
   )
 }
 
+const SKILL_ATTRIBUTE_COLORS: Record<string, string> = {
+  taijutsu: '#ff4d5f',
+  ninjutsu: '#4aa3ff',
+  genjutsu: '#a56cff',
+  kenjutsu: '#ffd747',
+}
+
+const SKILL_ATTRIBUTE_LABELS: Record<string, string> = {
+  taijutsu: 'Tai',
+  ninjutsu: 'Nin',
+  genjutsu: 'Gen',
+  kenjutsu: 'Ken',
+}
+
 type DamageSkillRowProps = {
   finalStats: Attributes
   skill: DamageSkill
 }
 
 function DamageSkillRow({ finalStats, skill }: DamageSkillRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const skillColor = SKILL_ATTRIBUTE_COLORS[skill.scalingAttribute]
+  const attrLabel = SKILL_ATTRIBUTE_LABELS[skill.scalingAttribute]
+  const damage =
+    skill.baseDamage > 0
+      ? calculateDamage(
+          skill.baseDamage,
+          finalStats[skill.scalingAttribute],
+          skill.scalingPercent,
+        )
+      : null
+  const scalingLabel =
+    skill.scalingPercent > 0
+      ? `${Math.round(skill.scalingPercent * 100)}% ${attrLabel}`
+      : null
+  const hasDetails = !!(skill.description || skill.effects?.length)
+  const detailsId = `${skill.id}-details`
+
   return (
-    <article className="damage-row">
+    <article
+      className="damage-row"
+      style={{ '--skill-color': skillColor } as React.CSSProperties}
+    >
       <div className="skill-row-header">
         <div className="skill-info">
-          <img
-            alt=""
-            className="skill-image"
-            loading="lazy"
-            src={getPublicAssetUrl(skill.imageSrc ?? UNKNOWN_SKILL_IMAGE)}
-          />
-          <div>
+          <div className="skill-image-ring">
+            <img
+              alt=""
+              className="skill-image"
+              loading="lazy"
+              src={getPublicAssetUrl(skill.imageSrc ?? UNKNOWN_SKILL_IMAGE)}
+            />
+          </div>
+          <div className="skill-text">
             <strong>{skill.name}</strong>
-            {skill.baseDamage > 0 && (
-              <span>
-                {skill.baseDamage} + {skill.scalingPercent * 100}%{' '}
-                {ATTRIBUTE_LABELS[skill.scalingAttribute]}
-              </span>
+            <span className="skill-attr-badge">{attrLabel}</span>
+          </div>
+        </div>
+        <div className="skill-row-right">
+          {hasDetails && (
+            <button
+              aria-controls={detailsId}
+              aria-expanded={isOpen}
+              className="skill-details-toggle"
+              onClick={() => setIsOpen((c) => !c)}
+              type="button"
+            >
+              {isOpen ? '−' : '+'} Detalhes
+            </button>
+          )}
+          {damage !== null && (
+            <div className="skill-damage-block">
+              <output>{damage}</output>
+              {scalingLabel && <em>{scalingLabel}</em>}
+            </div>
+          )}
+        </div>
+      </div>
+      {hasDetails && (
+        <div
+          className={`skill-details-clip ${isOpen ? 'open' : ''}`}
+          id={detailsId}
+        >
+          <div className="skill-details-body">
+            {skill.description && (
+              <p className="skill-description">{skill.description}</p>
+            )}
+            {skill.effects && skill.effects.length > 0 && (
+              <SkillEffects effects={skill.effects} skillId={skill.id} />
             )}
           </div>
         </div>
-        {(skill.description || skill.effects?.length) && (
-          <SkillDetails
-            description={skill.description}
-            effects={skill.effects}
-            skillId={skill.id}
-          />
-        )}
-        {skill.baseDamage > 0 && (
-          <output>
-            {calculateDamage(
-              skill.baseDamage,
-              finalStats[skill.scalingAttribute],
-              skill.scalingPercent,
-            )}
-          </output>
-        )}
-      </div>
+      )}
     </article>
   )
 }
 
-type SkillDetailsProps = {
-  description?: string
-  effects?: SkillEffect[]
-  skillId: string
-}
+// SkillDetails is now inlined into DamageSkillRow for layout control
 
-function SkillDetails({ description, effects, skillId }: SkillDetailsProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const detailsId = `${skillId}-details`
-
-  return (
-    <div className={`skill-details ${isOpen ? 'open' : ''}`}>
-      <button
-        aria-controls={detailsId}
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((current) => !current)}
-        type="button"
-      >
-        Detalhes e efeitos
-      </button>
-      <div className="skill-details-clip" id={detailsId}>
-        <div className="skill-details-body">
-          {description && (
-            <p className="skill-description">{description}</p>
-          )}
-          {effects && effects.length > 0 && (
-            <SkillEffects effects={effects} skillId={skillId} />
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 type SkillEffectsProps = {
   effects: SkillEffect[]

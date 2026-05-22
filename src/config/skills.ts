@@ -832,7 +832,7 @@ export const ELEMENTAL_SKILLS: Record<string, ElementalSkill[]> = {
       name: 'Doton: Dorojigoku',
       description: 'Cria uma poça de lama em área que prende os inimigos atingidos, dificultando a movimentação e mantendo-os expostos.',
       imageSrc: '/images/elementals/doton-3.png',
-      baseDamage: 120,
+      baseDamage: 0,
       scalingAttribute: 'ninjutsu',
       scalingPercent: 0.6,
       effects: [

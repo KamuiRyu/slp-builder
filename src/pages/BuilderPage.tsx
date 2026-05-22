@@ -223,6 +223,10 @@ export function BuilderPage() {
 
       <BuildLibrary
         build={build}
+        damageSkillGroups={damageSkillGroups}
+        elements={ELEMENTS}
+        equipments={EQUIPMENTS}
+        finalStats={finalStats}
         lineages={LINEAGES}
         onCopyBuildData={copyBuildData}
         onCopyShareUrl={copyShareUrl}
