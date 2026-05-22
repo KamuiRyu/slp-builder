@@ -177,7 +177,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
     {
       id: 'juuho-soushiken',
       name: 'Juuho Soushiken',
-      description: 'Envolve os punhos com chakra em forma de leões gêmeos, fortalecendo o Juuken e aumentando o Taijutsu em 39%. A energia também pode ser lançada contra o inimigo para causar dano direto.',
+      description: 'Envolve os punhos com chakra em forma de leões gêmeos, fortalecendo o Juuken e aumentando o Taijutsu em 12.5%, consome o chakra do usuário passivamente por segundo. A energia também pode ser lançada contra o inimigo para causar dano direto.',
       baseDamage: 150,
       scalingAttribute: 'taijutsu',
       scalingPercent: 0.4,
@@ -185,14 +185,15 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
         {
           type: 'buff',
           name: 'Punhos dos Leões Gêmeos',
-          description: 'Aumenta o Taijutsu do usuário em 39% enquanto os punhos estiverem envoltos pela técnica.',
-          percentStats: { taijutsu: 39 },
+          description: 'Aumenta o Taijutsu do usuário em 39% enquanto os punhos estiverem envoltos pela técnica. Consome o chakra do usuário passivamente por segundo.',
+          percentStats: { taijutsu: 12.5 },
         },
         {
           type: 'special',
           name: 'Disparo de Chakra',
           description: 'Permite lançar a energia dos leões gêmeos para atingir o alvo à distância.',
-        },
+        }
+        
       ],
     },
   ],
@@ -423,6 +424,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'magen-jubaku-satsu',
       name: 'Magen: Jubaku Satsu',
       description: 'Invoca um clone formado por pétalas que avança contra o inimigo. Ao tocar o alvo, o clone explode em uma rajada ilusória e o lança para cima.',
+      imageSrc: '/images/lineages/yuuhi-1.png',
       baseDamage: 50,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
@@ -438,6 +440,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'magen-hanagasumi',
       name: 'Magen: Hanagasumi',
       description: 'Conjura pétalas de flores e as dispara contra o inimigo causando dano direto.',
+      imageSrc: '/images/lineages/yuuhi-2.png',
       baseDamage: 100,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
@@ -446,6 +449,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'magen-sanshin',
       name: 'Magen: Sanshin',
       description: 'Cria uma nuvem de pétalas ao redor do usuário e a detona em seguida, atingindo inimigos próximos e lançando-os para cima.',
+      imageSrc: '/images/lineages/yuuhi-3.png',
       baseDamage: 150,
       scalingAttribute: 'genjutsu',
       scalingPercent: 0.4,
@@ -463,6 +467,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'kirigakure-no-jutsu',
       name: 'Kirigakure no Jutsu',
       description: 'Espalha uma névoa densa no campo de batalha e se oculta dentro dela. A técnica consome chakra continuamente enquanto estiver ativa e termina quando o chakra acaba, quando o usuário sai da área da névoa ou ao realizar o primeiro ataque.',
+      imageSrc: '/images/lineages/momochi-1.png',
       baseDamage: 0,
       scalingAttribute: 'kenjutsu',
       scalingPercent: 0,
@@ -483,6 +488,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'sairento-kiringu',
       name: 'Sairento Kiringu',
       description: 'Avança rapidamente contra o inimigo e desfere uma espadada precisa, aproveitando aberturas criadas pela névoa ou pela aproximação silenciosa.',
+      imageSrc: '/images/lineages/momochi-2.png',
       baseDamage: 100,
       scalingAttribute: 'kenjutsu',
       scalingPercent: 0.4,
@@ -491,6 +497,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       id: 'sakki',
       name: 'Sakki',
       description: 'Envolve o usuário em uma aura demoníaca de pura intenção assassina, pressionando os inimigos próximos e elevando drasticamente sua habilidade com espada.',
+      imageSrc: '/images/lineages/momochi-3.png',
       baseDamage: 0,
       scalingAttribute: 'kenjutsu',
       scalingPercent: 0,
@@ -885,7 +892,7 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
           type: 'buff',
           name: 'Punhos dos Leões Gêmeos',
           description: 'Aumenta o Taijutsu do usuário em 39%.',
-          percentStats: { taijutsu: 39 },
+          percentStats: { taijutsu: 12.5 },
         },
       ],
     },
@@ -905,6 +912,7 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
         },
       ],
     }
+   
   ],
 
   lotus: [

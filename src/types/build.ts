@@ -24,9 +24,11 @@ export type Build = {
 export type Lineage = {
   id: string
   name: string
+  imageSrc?: string
 }
 
 export type Element = {
   id: string
   name: string
+  imageSrc?: string
 }

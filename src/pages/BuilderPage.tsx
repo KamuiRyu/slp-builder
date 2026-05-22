@@ -13,9 +13,9 @@ import {
   LINEAGE_SKILLS,
 } from '../config/skills'
 import { BuildPreview } from '../components/BuildPreview'
+import type { DamageSkillGroup } from '../components/BuildPreview'
 import { BuilderForm } from '../components/BuilderForm'
 import { BuildLibrary } from '../components/BuildLibrary'
-import { BrandLogo } from '../components/BrandLogo'
 import {
   INITIAL_ATTRIBUTE_POINTS,
   INITIAL_TRAINING_POINTS,
@@ -126,7 +126,29 @@ export function BuilderPage() {
   const elementalSkills = activeElementIds.flatMap(
     (elementId) => ELEMENTAL_SKILLS[elementId] ?? [],
   )
-  const activeDamageSkills = [...lineageSkills, ...elementalSkills]
+  const weaponSkills =
+    EQUIPMENTS.find((equipment) => equipment.id === build.equipments.weaponId)
+      ?.exclusiveSkills ?? []
+  const damageSkillGroups: DamageSkillGroup[] = [
+    {
+      id: 'lineage',
+      title: 'Linhagem',
+      emptyMessage: 'Nenhum jutsu de linhagem disponível.',
+      skills: lineageSkills,
+    },
+    {
+      id: 'element',
+      title: 'Elemento',
+      emptyMessage: 'Nenhum jutsu elemental disponível.',
+      skills: elementalSkills,
+    },
+    {
+      id: 'weapon',
+      title: 'Arma',
+      emptyMessage: 'Equipe uma arma com skill exclusiva.',
+      skills: weaponSkills,
+    },
+  ]
   const availableBuffSkills = [
     ...BUFF_SKILLS,
     ...(LINEAGE_BUFF_SKILLS[build.lineageId] ?? []),
@@ -143,6 +165,18 @@ export function BuilderPage() {
     await navigator.clipboard.writeText(shareUrl)
   }
 
+  function loadSavedBuild(savedBuild: Build) {
+    form.reset(normalizeBuild(savedBuild))
+  }
+
+  function deleteSavedBuild(buildId: string) {
+    const nextSavedBuilds = savedBuilds.filter(
+      (savedBuild) => savedBuild.id !== buildId,
+    )
+
+    setSavedBuilds(nextSavedBuilds)
+    writeSavedBuilds(nextSavedBuilds)
+  }
   async function copyBuildData() {
     await navigator.clipboard.writeText(encodeBuild(build))
   }
@@ -157,29 +191,9 @@ export function BuilderPage() {
     writeSavedBuilds(nextSavedBuilds)
   }
 
-  function loadSavedBuild(savedBuild: Build) {
-    form.reset(normalizeBuild(savedBuild))
-  }
-
-  function deleteSavedBuild(buildId: string) {
-    const nextSavedBuilds = savedBuilds.filter(
-      (savedBuild) => savedBuild.id !== buildId,
-    )
-
-    setSavedBuilds(nextSavedBuilds)
-    writeSavedBuilds(nextSavedBuilds)
-  }
-
   return (
     <main className="app-shell" style={appBackgroundStyle}>
-      <section className="hero-section">
-        <div className="hero-copy">
-          <h1>
-            <BrandLogo />
-          </h1>
-          <p>Monte seu shinobi</p>
-        </div>
-      </section>
+      
 
       <div className="builder-layout">
         <BuilderForm
@@ -196,7 +210,7 @@ export function BuilderPage() {
         <div className="builder-sidebar">
           <BuildPreview
             build={build}
-            damageSkills={activeDamageSkills}
+            damageSkillGroups={damageSkillGroups}
             finalStats={finalStats}
             maxAttributePoints={activeRank.maxAttributePoints}
             maxTrainableAttributePoints={activeRank.maxTrainableAttributePoints}
@@ -205,6 +219,7 @@ export function BuilderPage() {
           />
         </div>
       </div>
+
 
       <BuildLibrary
         build={build}
