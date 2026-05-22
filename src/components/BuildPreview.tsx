@@ -22,9 +22,16 @@ type BuildPreviewProps = {
   finalStats: Attributes
   maxAttributePoints: number
   maxTrainableAttributePoints: number
-  damageSkills: DamageSkill[]
+  damageSkillGroups: DamageSkillGroup[]
   shareUrl: string
   onCopyShareUrl: () => void
+}
+
+export type DamageSkillGroup = {
+  id: string
+  title: string
+  emptyMessage: string
+  skills: DamageSkill[]
 }
 
 export function BuildPreview({
@@ -32,12 +39,15 @@ export function BuildPreview({
   finalStats,
   maxAttributePoints,
   maxTrainableAttributePoints,
-  damageSkills,
+  damageSkillGroups,
 }: BuildPreviewProps) {
   const distributedPoints = calculateDistributedPoints(build.attributes)
   const isOverLimit = distributedPoints > maxAttributePoints
   const hasTrainingOverLimit = TRAINABLE_ATTRIBUTES.some(
     (attribute) => build.training[attribute] > maxTrainableAttributePoints,
+  )
+  const hasDamageSkills = damageSkillGroups.some(
+    (group) => group.skills.length > 0,
   )
 
   return (
@@ -112,53 +122,80 @@ export function BuildPreview({
           <Swords aria-hidden="true" />
           <h3>Dano em tempo real</h3>
         </div>
-        {damageSkills.length === 0 ? (
+        {!hasDamageSkills ? (
           <p className="muted">Selecione jutsus para ver o dano calculado.</p>
         ) : (
-          damageSkills.map((skill) => (
-            <article className="damage-row" key={skill.id}>
-              <div className="skill-row-header">
-                <div className="skill-info">
-                  <img
-                    alt=""
-                    className="skill-image"
-                    loading="lazy"
-                    src={getPublicAssetUrl(
-                      skill.imageSrc ?? UNKNOWN_SKILL_IMAGE,
-                    )}
-                  />
-                  <div>
-                    <strong>{skill.name}</strong>
-                    {skill.baseDamage > 0 && (
-                      <span>
-                        {skill.baseDamage} + {skill.scalingPercent * 100}%{' '}
-                        {ATTRIBUTE_LABELS[skill.scalingAttribute]}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {(skill.description || skill.effects?.length) && (
-                  <SkillDetails
-                    description={skill.description}
-                    effects={skill.effects}
-                    skillId={skill.id}
-                  />
-                )}
-                {skill.baseDamage > 0 && (
-                  <output>
-                    {calculateDamage(
-                      skill.baseDamage,
-                      finalStats[skill.scalingAttribute],
-                      skill.scalingPercent,
-                    )}
-                  </output>
-                )}
+          damageSkillGroups.map((group) => (
+            <div className="damage-group" key={group.id}>
+              <div className="damage-group-heading">
+                <h4>{group.title}</h4>
+                <span>{group.skills.length}</span>
               </div>
-            </article>
+              {group.skills.length === 0 ? (
+                <p className="muted damage-group-empty">
+                  {group.emptyMessage}
+                </p>
+              ) : (
+                group.skills.map((skill) => (
+                  <DamageSkillRow
+                    finalStats={finalStats}
+                    key={skill.id}
+                    skill={skill}
+                  />
+                ))
+              )}
+            </div>
           ))
         )}
       </section>
     </aside>
+  )
+}
+
+type DamageSkillRowProps = {
+  finalStats: Attributes
+  skill: DamageSkill
+}
+
+function DamageSkillRow({ finalStats, skill }: DamageSkillRowProps) {
+  return (
+    <article className="damage-row">
+      <div className="skill-row-header">
+        <div className="skill-info">
+          <img
+            alt=""
+            className="skill-image"
+            loading="lazy"
+            src={getPublicAssetUrl(skill.imageSrc ?? UNKNOWN_SKILL_IMAGE)}
+          />
+          <div>
+            <strong>{skill.name}</strong>
+            {skill.baseDamage > 0 && (
+              <span>
+                {skill.baseDamage} + {skill.scalingPercent * 100}%{' '}
+                {ATTRIBUTE_LABELS[skill.scalingAttribute]}
+              </span>
+            )}
+          </div>
+        </div>
+        {(skill.description || skill.effects?.length) && (
+          <SkillDetails
+            description={skill.description}
+            effects={skill.effects}
+            skillId={skill.id}
+          />
+        )}
+        {skill.baseDamage > 0 && (
+          <output>
+            {calculateDamage(
+              skill.baseDamage,
+              finalStats[skill.scalingAttribute],
+              skill.scalingPercent,
+            )}
+          </output>
+        )}
+      </div>
+    </article>
   )
 }
 

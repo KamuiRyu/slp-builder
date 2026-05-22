@@ -22,7 +22,7 @@ import {
   DISTRIBUTABLE_ATTRIBUTES,
   TRAINABLE_ATTRIBUTES,
 } from '../types/attributes'
-import type { Build } from '../types/build'
+import type { Build, Element, Lineage } from '../types/build'
 import type { Equipment, EquipmentType } from '../types/equipment'
 import type { BuffSkill } from '../types/skill'
 import type { BuildFormValues } from '../utils/validation'
@@ -37,8 +37,8 @@ type BuilderFormProps = {
   errors: FieldErrors<BuildFormValues>
   register: UseFormRegister<BuildFormValues>
   setValue: UseFormSetValue<BuildFormValues>
-  lineages: Array<{ id: string; name: string }>
-  elements: Array<{ id: string; name: string }>
+  lineages: Lineage[]
+  elements: Element[]
   ranks: Array<{
     id: string
     name: string
@@ -68,7 +68,7 @@ const equipmentFields: Array<{
 
 const DIGITS_ONLY_REGEX = /\D/g
 const EMPTY_SELECT_VALUE = '__none__'
-const UNKNOWN_SKILL_IMAGE = '/images/elementals/unknown.png'
+const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
 
 function clampNumericValue(rawValue: string, max: number): number {
   const digitsOnly = rawValue.replace(DIGITS_ONLY_REGEX, '')
@@ -242,7 +242,10 @@ export function BuilderForm({
               <SelectContent>
                 {lineages.map((lineage) => (
                   <SelectItem key={lineage.id} value={lineage.id}>
-                    {lineage.name}
+                    <SelectOptionMedia
+                      imageSrc={lineage.imageSrc}
+                      name={lineage.name}
+                    />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -261,7 +264,10 @@ export function BuilderForm({
               <SelectContent>
                 {elements.map((element) => (
                   <SelectItem key={element.id} value={element.id}>
-                    {element.name}
+                    <SelectOptionMedia
+                      imageSrc={element.imageSrc}
+                      name={element.name}
+                    />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -294,7 +300,7 @@ export function BuilderForm({
                       className="active-skill-image"
                       loading="lazy"
                       src={getPublicAssetUrl(
-                        skill.imageSrc ?? UNKNOWN_SKILL_IMAGE,
+                        skill.imageSrc ?? UNKNOWN_IMAGE,
                       )}
                     />
                     <span>
@@ -423,7 +429,11 @@ export function BuilderForm({
                     .filter((equipment) => equipment.type === type)
                     .map((equipment) => (
                       <SelectItem key={equipment.id} value={equipment.id}>
-                        {equipment.name}
+                        <SelectOptionMedia
+                          imageSrc={equipment.imageSrc}
+                          name={equipment.name}
+                          subtitle={formatEquipmentStats(equipment)}
+                        />
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -438,6 +448,49 @@ export function BuilderForm({
 
 function getSkillLevels(skill: BuffSkill) {
   return skill.effects?.flatMap((effect) => effect.levels ?? []) ?? []
+}
+
+function formatEquipmentStats(equipment: Equipment): string | undefined {
+  const stats = Object.entries(equipment.stats ?? {})
+
+  if (stats.length === 0) {
+    return undefined
+  }
+
+  return stats
+    .map(([attribute, value]) => {
+      const label = ATTRIBUTE_LABELS[attribute as AttributeKey]
+
+      return `${value && value > 0 ? '+' : ''}${value} ${label}`
+    })
+    .join(' / ')
+}
+
+type SelectOptionMediaProps = {
+  imageSrc?: string
+  name: string
+  subtitle?: string
+}
+
+function SelectOptionMedia({
+  imageSrc,
+  name,
+  subtitle,
+}: SelectOptionMediaProps) {
+  return (
+    <span className="select-option-media">
+      <img
+        alt=""
+        className="select-option-image"
+        loading="lazy"
+        src={getPublicAssetUrl(imageSrc ?? UNKNOWN_IMAGE)}
+      />
+      <span className="select-option-copy">
+        <strong>{name}</strong>
+        {subtitle && <small>{subtitle}</small>}
+      </span>
+    </span>
+  )
 }
 
 type AttributeRowProps = {
