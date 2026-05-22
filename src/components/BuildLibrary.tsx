@@ -30,7 +30,6 @@ import type { Equipment, EquipmentType } from '../types/equipment'
 import type { SavedBuild } from '../utils/localBuilds'
 import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
-import { convertAttributePointsToStat } from '../utils/stats'
 
 type BuildLibraryProps = {
   build: Build
@@ -549,7 +548,7 @@ function BuildShareCard({
       (bonuses, equipment) => {
         for (const [attribute, value] of Object.entries(equipment.stats ?? {})) {
           const key = attribute as AttributeKey
-          bonuses[key] += convertAttributePointsToStat(key, value ?? 0)
+          bonuses[key] += value ?? 0
         }
 
         return bonuses
@@ -576,6 +575,22 @@ function BuildShareCard({
               <ShareImage imageSrc={element?.imageSrc} label="Elemento" />
             </div>
             <span className="share-card-rank">{rank?.name ?? 'Graduação'}</span>
+            <div className="share-card-stats-hud">
+              <div className="share-hud-bar hp-bar">
+                <span className="hud-label">HP</span>
+                <div className="hud-track">
+                  <div className="hud-fill" style={{ width: `${Math.min(100, (finalStats.vida / 4000) * 100)}%` }} />
+                </div>
+                <span className="hud-value">{finalStats.vida}</span>
+              </div>
+              <div className="share-hud-bar cp-bar">
+                <span className="hud-label">CP</span>
+                <div className="hud-track">
+                  <div className="hud-fill" style={{ width: `${Math.min(100, (finalStats.chakra / 3000) * 100)}%` }} />
+                </div>
+                <span className="hud-value">{finalStats.chakra}</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="share-radar-card">
