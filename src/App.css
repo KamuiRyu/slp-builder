@@ -1302,7 +1302,7 @@
   box-shadow: none;
 }
 
-.share-card.theme-scroll .share-card-meta > strong,
+.share-card.theme-scroll .share-card-name-row strong,
 .share-card.theme-scroll .share-card-footer span:first-child {
   color: #4e342e;
   text-shadow: none;
@@ -1439,7 +1439,7 @@
 }
 
 .share-card.theme-akatsuki .share-card-title,
-.share-card.theme-akatsuki .share-card-meta > strong {
+.share-card.theme-akatsuki .share-card-name-row strong {
   color: #ef4444;
   text-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
 }
@@ -1476,7 +1476,7 @@
 }
 
 .share-card.theme-sage .share-card-title,
-.share-card.theme-sage .share-card-meta > strong {
+.share-card.theme-sage .share-card-name-row strong {
   color: #f97316;
   text-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
 }
@@ -1512,7 +1512,7 @@
 }
 
 .share-card.theme-chakra .share-card-title,
-.share-card.theme-chakra .share-card-meta > strong {
+.share-card.theme-chakra .share-card-name-row strong {
   color: #06b6d4;
   text-shadow: 0 0 18px rgba(6, 182, 212, 0.55);
 }
@@ -1622,7 +1622,21 @@
   min-width: 0;
 }
 
-.share-card-meta > strong {
+.share-card-name-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.share-card-name-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+.share-card-name-row strong {
   color: var(--text-strong);
   font-family: Arial, Helvetica, sans-serif;
   font-size: 48px;
@@ -1632,21 +1646,38 @@
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 
+.share-card-rank {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--theme-accent, var(--cyan));
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.share-card.theme-scroll .share-card-rank {
+  color: #5d4037 !important;
+  text-shadow: none !important;
+}
+
 .share-card-meta .share-origin-image {
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 48px;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 4px 16px 4px 6px;
+  border-radius: 50%;
+  padding: 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
 }
 
 .share-card-meta .share-origin-image img {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: transparent;
   border: none;
@@ -1654,25 +1685,11 @@
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
 }
 
-.share-card-meta .share-origin-image span {
-  display: block;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 /* Scroll Theme adjustments for badges */
 .share-card.theme-scroll .share-card-meta .share-origin-image {
   background: rgba(109, 76, 65, 0.08);
   border-color: rgba(109, 76, 65, 0.18);
   box-shadow: none;
-}
-
-.share-card.theme-scroll .share-card-meta .share-origin-image span {
-  color: #5d4037;
 }
 
 .share-radar-card {
