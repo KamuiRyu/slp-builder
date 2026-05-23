@@ -9,7 +9,7 @@ import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
 import { calculateDistributedPoints } from '../utils/stats'
 
-const UNKNOWN_SKILL_IMAGE = '/images/elementals/unknown.png'
+const UNKNOWN_SKILL_IMAGE = '/images/elementals/unknown.webp'
 
 const effectTypeLabels: Record<SkillEffect['type'], string> = {
   buff: 'Buff',
@@ -173,19 +173,22 @@ type DamageSkillRowProps = {
 
 function DamageSkillRow({ finalStats, skill }: DamageSkillRowProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const skillColor = SKILL_ATTRIBUTE_COLORS[skill.scalingAttribute]
-  const attrLabel = SKILL_ATTRIBUTE_LABELS[skill.scalingAttribute]
+  const hasScaling = skill.scalingAttribute && skill.scalingPercent !== undefined
+  const skillColor = hasScaling ? SKILL_ATTRIBUTE_COLORS[skill.scalingAttribute!] : '#888'
+  const attrLabel = hasScaling ? SKILL_ATTRIBUTE_LABELS[skill.scalingAttribute!] : ''
   const damage =
-    skill.baseDamage > 0
-      ? calculateDamage(
-          skill.baseDamage,
-          finalStats[skill.scalingAttribute],
-          skill.scalingPercent,
-        )
+    skill.baseDamage !== undefined
+      ? hasScaling && skill.scalingAttribute
+        ? calculateDamage(
+            skill.baseDamage,
+            finalStats[skill.scalingAttribute],
+            skill.scalingPercent!,
+          )
+        : skill.baseDamage
       : null
   const scalingLabel =
-    skill.scalingPercent > 0
-      ? `${Math.round(skill.scalingPercent * 100)}% ${attrLabel}`
+    hasScaling && skill.scalingPercent! > 0
+      ? `${Math.round(skill.scalingPercent! * 100)}% ${attrLabel}`
       : null
   const hasDetails = !!(skill.description || skill.effects?.length)
   const detailsId = `${skill.id}-details`
@@ -207,7 +210,7 @@ function DamageSkillRow({ finalStats, skill }: DamageSkillRowProps) {
           </div>
           <div className="skill-text">
             <strong>{skill.name}</strong>
-            <span className="skill-attr-badge">{attrLabel}</span>
+            {attrLabel && <span className="skill-attr-badge">{attrLabel}</span>}
           </div>
         </div>
         <div className="skill-row-right">

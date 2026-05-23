@@ -47,6 +47,7 @@ type BuilderFormProps = {
   }>
   equipments: Equipment[]
   buffSkills: BuffSkill[]
+  generalSkills: BuffSkill[]
 }
 
 const equipmentSlots: Array<{
@@ -54,16 +55,16 @@ const equipmentSlots: Array<{
   label: string
   type: EquipmentType
 }> = [
-  { field: 'weaponId', label: 'Arma', type: 'weapon' },
-  { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
-  { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
-  { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
-  { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
-]
+    { field: 'weaponId', label: 'Arma', type: 'weapon' },
+    { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
+    { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
+    { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
+    { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
+  ]
 
 const DIGITS_ONLY_REGEX = /\D/g
 const EMPTY_SELECT_VALUE = '__none__'
-const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
+const UNKNOWN_IMAGE = '/images/elementals/unknown.webp'
 
 function clampNumericValue(rawValue: string, max: number): number {
   const digitsOnly = rawValue.replace(DIGITS_ONLY_REGEX, '')
@@ -101,6 +102,7 @@ export function BuilderForm({
   ranks,
   equipments,
   buffSkills,
+  generalSkills
 }: BuilderFormProps) {
   const activeRank = ranks.find((rank) => rank.id === build.rankId) ?? ranks[0]
   const distributedPoints = calculateDistributedPoints(build.attributes)
@@ -184,6 +186,23 @@ export function BuilderForm({
     }
   }
 
+  function toggleGeneralSkill(skill: BuffSkill, checked: boolean) {
+    const selectedIds = build.selectedSkills.generalSkillIds
+    const nextIds = checked
+      ? [...selectedIds, skill.id]
+      : selectedIds.filter((skillId) => skillId !== skill.id)
+    const firstLevel = getSkillLevels(skill)[0]?.level
+
+    updateFieldValue('selectedSkills.generalSkillIds', nextIds)
+
+    if (checked && firstLevel && !build.skillLevels[skill.id]) {
+      updateFieldValue('skillLevels', {
+        ...build.skillLevels,
+        [skill.id]: firstLevel,
+      })
+    }
+  }
+
   function updateSkillLevel(skillId: string, level: string) {
     updateFieldValue('skillLevels', {
       ...build.skillLevels,
@@ -196,6 +215,7 @@ export function BuilderForm({
       {/* Campos ocultos para persistência do avatar e reatividade */}
       <input type="hidden" {...register('avatarId')} />
       <input type="hidden" {...register('avatarImageIndex', { valueAsNumber: true })} />
+      <input type="hidden" {...register('selectedSkills.generalSkillIds')} />
 
       <section className="form-card identity-card">
         <span className="eyebrow">Ficha shinobi</span>

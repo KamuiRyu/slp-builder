@@ -53,4 +53,15 @@ export type BuffSkill = {
   effects?: SkillEffect[]
 }
 
-export type DamageSkill = LineageSkill | ElementalSkill
+export type GeneralSkill = {
+  id: string
+  name: string
+  imageSrc?: string
+  description: string
+  baseDamage?: number
+  scalingAttribute?: ScalableAttributeKey
+  scalingPercent?: number
+  effects?: SkillEffect[]
+}
+
+export type DamageSkill = LineageSkill | ElementalSkill | GeneralSkill

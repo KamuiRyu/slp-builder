@@ -61,6 +61,7 @@ export const buildSchema = z.object({
     lineageSkillIds: z.array(z.string()),
     elementalSkillIds: z.array(z.string()),
     buffSkillIds: z.array(z.string()),
+    generalSkillIds: z.array(z.string()),
   }),
   skillLevels: z.record(z.string(), z.number().int().min(1)),
 })

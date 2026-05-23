@@ -6,7 +6,7 @@ export function BrandLogo() {
       <img
         alt="Shinobi Legends Forge"
         className="brand-logo-image"
-        src={getPublicAssetUrl('/images/logo.png')}
+        src={getPublicAssetUrl('/images/logo.webp')}
       />
     </div>
   )

@@ -4,26 +4,26 @@ export const ELEMENTS: Element[] = [
   {
     id: 'fire',
     name: 'Katon',
-    imageSrc: '/images/elementals/katon.png',
+    imageSrc: '/images/elementals/katon.webp',
   },
   {
     id: 'wind',
     name: 'Fuuton',
-    imageSrc: '/images/elementals/fuuton.png',
+    imageSrc: '/images/elementals/fuuton.webp',
   },
   {
     id: 'lightning',
     name: 'Raiton',
-    imageSrc: '/images/elementals/raiton.png',
+    imageSrc: '/images/elementals/raiton.webp',
   },
   {
     id: 'water',
     name: 'Suiton',
-    imageSrc: '/images/elementals/suiton.png',
+    imageSrc: '/images/elementals/suiton.webp',
   },
   {
     id: 'earth',
     name: 'Doton',
-    imageSrc: '/images/elementals/doton.png',
+    imageSrc: '/images/elementals/doton.webp',
   },
 ]

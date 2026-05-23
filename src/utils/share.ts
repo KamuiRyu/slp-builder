@@ -1,7 +1,7 @@
 import type { Build } from '../types/build'
 
 type CompactBuild = [
-  version: 2 | 3 | 4,
+  version: 2 | 3 | 4 | 5,
   name: string,
   rankId: string,
   lineageId: string,
@@ -9,7 +9,7 @@ type CompactBuild = [
   attributes: [number, number, number, number, number, number],
   training: [number, number, number, number],
   equipments: Array<string | undefined>,
-  selectedSkills: [string[], string[], string[]],
+  selectedSkills: [string[], string[], string[], string[]?],
   skillLevels: Record<string, number>,
   avatarId?: string,
   avatarImageIndex?: number,
@@ -39,7 +39,7 @@ function decodeBase64(encoded: string): string {
 
 function compactBuild(build: Build): CompactBuild {
   return [
-    4,
+    5,
     build.name,
     build.rankId,
     build.lineageId,
@@ -69,6 +69,7 @@ function compactBuild(build: Build): CompactBuild {
       build.selectedSkills.lineageSkillIds,
       build.selectedSkills.elementalSkillIds,
       build.selectedSkills.buffSkillIds,
+      build.selectedSkills.generalSkillIds,
     ],
     build.skillLevels,
     build.avatarId,
@@ -132,13 +133,14 @@ function expandBuild(compact: CompactBuild): Build {
       lineageSkillIds: selectedSkills[0],
       elementalSkillIds: selectedSkills[1],
       buffSkillIds: selectedSkills[2],
+      generalSkillIds: version >= 5 ? (selectedSkills[3] ?? []) : [],
     },
     skillLevels,
   }
 }
 
 function isCompactBuild(value: unknown): value is CompactBuild {
-  return Array.isArray(value) && (value[0] === 2 || value[0] === 3 || value[0] === 4)
+  return Array.isArray(value) && (value[0] === 2 || value[0] === 3 || value[0] === 4 || value[0] === 5)
 }
 
 export function encodeBuild(build: Build): string {

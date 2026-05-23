@@ -14,7 +14,7 @@ export const EQUIPMENTS: Equipment[] = [
         baseDamage: 80,
         scalingAttribute: 'kenjutsu',
         scalingPercent: 0.4,
-        imageSrc: '/images/elementals/unknown.png',
+        imageSrc: '/images/elementals/unknown.webp',
         effects: [
           {
             type: 'debuff',
@@ -39,20 +39,20 @@ export const EQUIPMENTS: Equipment[] = [
         baseDamage: 45,
         scalingAttribute: 'taijutsu',
         scalingPercent: 0.4,
-        imageSrc: '/images/elementals/unknown.png',
+        imageSrc: '/images/elementals/unknown.webp',
       },
     ],
   },*/
   {
     id: 'hat',
     name: 'Chapéu',
-    imageSrc: '/images/equipments/hat.png',
+    imageSrc: '/images/equipments/hat.webp',
     type: 'equipment',
   },
   {
     id: 'akatsuki-hat',
     name: 'Chapéu de Akatsuki',
-    imageSrc: '/images/equipments/akatsuki-hat.png',
+    imageSrc: '/images/equipments/akatsuki-hat.webp',
     type: 'equipment',
     stats: { vida: 10, chakra: 10 },
   },
@@ -60,14 +60,14 @@ export const EQUIPMENTS: Equipment[] = [
   {
     id: 'kage-hat',
     name: 'Chapéu de Kage',
-    imageSrc: '/images/equipments/kage-hat.png',
+    imageSrc: '/images/equipments/kage-hat.webp',
     type: 'equipment',
     stats: { vida: 50, chakra: 50 },
   },
   {
     id: 'chunnin-jacket',
     name: 'Colete Chunnin',
-    imageSrc: '/images/equipments/chunnin-jacket.png',
+    imageSrc: '/images/equipments/chunnin-jacket.webp',
     type: 'equipment',
     stats: { vida: 10, chakra: 12 },
   },
@@ -75,7 +75,7 @@ export const EQUIPMENTS: Equipment[] = [
   {
     id: 'bandana',
     name: 'Bandana',
-    imageSrc: '/images/equipments/bandana.png',
+    imageSrc: '/images/equipments/bandana.webp',
     type: 'accessory',
     stats: { vida: 5, chakra: 3 },
   },

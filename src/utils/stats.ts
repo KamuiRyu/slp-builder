@@ -63,7 +63,8 @@ export function calculateFinalStats(
   }
 
   const selectedBuffSkills = buffSkills.filter((skill) =>
-    build.selectedSkills.buffSkillIds.includes(skill.id),
+    build.selectedSkills.buffSkillIds.includes(skill.id) ||
+    build.selectedSkills.generalSkillIds.includes(skill.id),
   )
 
   for (const skill of selectedBuffSkills) {
