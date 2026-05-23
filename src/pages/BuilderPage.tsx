@@ -9,6 +9,7 @@ import { NINJA_RANKS } from '../config/ranks'
 import {
   BUFF_SKILLS,
   ELEMENTAL_SKILLS,
+  GENERAL_SKILLS,
   LINEAGE_BUFF_SKILLS,
   LINEAGE_SKILLS,
 } from '../config/skills'
@@ -45,6 +46,7 @@ const DEFAULT_BUILD: Build = {
     lineageSkillIds: [],
     elementalSkillIds: [],
     buffSkillIds: [],
+    generalSkillIds: [],
   },
   skillLevels: {},
 }
@@ -154,6 +156,12 @@ export function BuilderPage() {
       emptyMessage: 'Equipe uma arma com skill exclusiva.',
       skills: weaponSkills,
     },
+    {
+      id: 'general',
+      title: 'Geral',
+      emptyMessage: 'Nenhum jutsu geral selecionado.',
+      skills: GENERAL_SKILLS,
+    },
   ]
   const availableBuffSkills = [
     ...BUFF_SKILLS,
@@ -163,7 +171,7 @@ export function BuilderPage() {
     build,
     activeRank,
     EQUIPMENTS,
-    availableBuffSkills,
+    [...availableBuffSkills, ...GENERAL_SKILLS],
   )
   const shareUrl = createShareUrl(build)
 
@@ -199,12 +207,13 @@ export function BuilderPage() {
 
   return (
     <main className="app-shell" style={appBackgroundStyle}>
-      
+
 
       <div className="builder-layout">
         <BuilderForm
           build={build}
           buffSkills={availableBuffSkills}
+          generalSkills={GENERAL_SKILLS.filter((skill) => skill.effects && skill.effects.length > 0)}
           elements={ELEMENTS}
           equipments={EQUIPMENTS}
           errors={form.formState.errors}

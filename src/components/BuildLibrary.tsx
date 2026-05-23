@@ -54,18 +54,20 @@ type BuildLibraryProps = {
 }
 
 const THEME_PALETTE = [
-  // Oranges & Yellows (Naruto/Minato/Sun)
-  '#FF9800', '#F57C00', '#EF6C00', '#FFB74D', '#FDD835', '#FFEB3B', '#FFEE58',
-  // Blues (Uchiha/Water/Moon)
-  '#4A90E2', '#1976D2', '#1565C0', '#03A9F4', '#00BCD4', '#80DEEA', '#2196F3',
-  // Reds & Pinks (Akatsuki/Sakura/Will)
-  '#D32F2F', '#C62828', '#B71C1C', '#E53935', '#F06292', '#EC407A', '#F48FB1',
-  // Greens (Lee/Wood/Nature)
-  '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#8BC34A', '#CDDC39', '#AED581',
-  // Purples & Violets (Sound/Rinnegan/Spirit)
-  '#7B1FA2', '#6A1B9A', '#4A148C', '#9C27B0', '#9575CD', '#7E57C2', '#B39DDB',
-  // Browns & Grays (Sand/Earth/Cloud/Steel)
-  '#A1887F', '#8D6E63', '#6D4C41', '#4E342E', '#90A4AE', '#607D8B', '#424242'
+  // Oranges & Yellows (Naruto/Minato/Sun/Kyuubi)
+  '#FF9800', '#F57C00', '#EF6C00', '#FFB74D', '#FDD835', '#FFEB3B', '#FFEE58', '#FF5E00', '#FFA726',
+  // Blues (Uchiha/Water/Moon/Chidori)
+  '#4A90E2', '#1976D2', '#1565C0', '#03A9F4', '#00BCD4', '#80DEEA', '#2196F3', '#00E5FF', '#00FFFF', '#0F52BA',
+  // Reds & Pinks (Akatsuki/Sakura/Will/Kushina)
+  '#D32F2F', '#C62828', '#B71C1C', '#E53935', '#F06292', '#EC407A', '#F48FB1', '#FF007F', '#FF3366', '#E0115F',
+  // Greens (Lee/Wood/Nature/Senjutsu)
+  '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#8BC34A', '#CDDC39', '#AED581', '#00FFCC', '#39FF14', '#50C878',
+  // Purples & Violets (Sound/Rinnegan/Spirit/Susanoo)
+  '#7B1FA2', '#6A1B9A', '#4A148C', '#9C27B0', '#9575CD', '#7E57C2', '#B39DDB', '#8E44AD', '#DDA0DD', '#DA70D6',
+  // Golds & Silvers (Metallic/Legendary)
+  '#D4AF37', '#FFD700', '#C0C0C0', '#E6E6FA', '#FFFDD0',
+  // Browns & Grays (Sand/Earth/Cloud/Steel/Obsidian)
+  '#A1887F', '#8D6E63', '#6D4C41', '#4E342E', '#90A4AE', '#607D8B', '#424242', '#1A1A1A', '#2C3E50', '#7F8C8D'
 ]
 
 const DEFAULT_AVATAR_IMAGE = '/images/elementals/unknown.webp'
@@ -710,7 +712,17 @@ function BuildShareCard({
         kenjutsu: 0,
       } satisfies Record<AttributeKey, number>,
     )
-  const shareSkills = damageSkillGroups.flatMap((group) => group.skills)
+  const shareSkills = damageSkillGroups.flatMap((group) => 
+    group.skills.filter(skill => {
+      const selectedIds = [
+        ...build.selectedSkills.lineageSkillIds,
+        ...build.selectedSkills.elementalSkillIds,
+        ...build.selectedSkills.buffSkillIds,
+        ...build.selectedSkills.generalSkillIds
+      ]
+      return selectedIds.includes(skill.id)
+    })
+  )
 
   function hexToRgb(hex: string) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
@@ -824,19 +836,23 @@ function BuildShareCard({
           ) : (
             <div className="share-skill-list">
               {shareSkills.map((skill) => {
+                const hasScaling = skill.scalingAttribute && skill.scalingPercent !== undefined
+                const skillColor = hasScaling ? SKILL_ATTRIBUTE_COLORS[skill.scalingAttribute!] : '#888'
+                const attrLabel = hasScaling ? SKILL_ATTRIBUTE_LABELS[skill.scalingAttribute!] : ''
                 const damage =
-                  skill.baseDamage > 0
-                    ? calculateDamage(
-                      skill.baseDamage,
-                      finalStats[skill.scalingAttribute],
-                      skill.scalingPercent,
-                    )
+                  skill.baseDamage !== undefined
+                    ? hasScaling && skill.scalingAttribute
+                      ? calculateDamage(
+                          skill.baseDamage,
+                          finalStats[skill.scalingAttribute],
+                          skill.scalingPercent!,
+                        )
+                      : skill.baseDamage
                     : null
-                const skillColor = SKILL_ATTRIBUTE_COLORS[skill.scalingAttribute]
-                const attrLabel = SKILL_ATTRIBUTE_LABELS[skill.scalingAttribute]
-                const scalingLabel = skill.scalingPercent > 0
-                  ? `${Math.round(skill.scalingPercent * 100)}% ${attrLabel}`
-                  : null
+                const scalingLabel =
+                  hasScaling && skill.scalingPercent! > 0
+                    ? `${Math.round(skill.scalingPercent! * 100)}% ${attrLabel}`
+                    : null
 
                 return (
                   <div
@@ -855,7 +871,7 @@ function BuildShareCard({
                     <div className="share-skill-info">
                       <strong>{skill.name}</strong>
                       <div className="share-skill-bottom">
-                        <span className="share-skill-attr">{attrLabel}</span>
+                        {attrLabel && <span className="share-skill-attr">{attrLabel}</span>}
                         {damage !== null && (
                           <div className="share-skill-damage">
                             <b>{damage}</b>

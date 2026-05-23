@@ -22,6 +22,7 @@ export type Build = {
     lineageSkillIds: string[]
     elementalSkillIds: string[]
     buffSkillIds: string[]
+    generalSkillIds: string[]
   }
   skillLevels: Record<string, number>
 }

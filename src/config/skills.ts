@@ -1,4 +1,4 @@
-import type { BuffSkill, ElementalSkill, LineageSkill } from '../types/skill'
+import type { BuffSkill, ElementalSkill, GeneralSkill, LineageSkill } from '../types/skill'
 
 export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
   uchiha: [
@@ -864,7 +864,214 @@ export const ELEMENTAL_SKILLS: Record<string, ElementalSkill[]> = {
   ],
 }
 
-export const BUFF_SKILLS: BuffSkill[] = []
+export const GENERAL_SKILLS: GeneralSkill[] = [
+  {
+    id: 'kage-bunshin',
+    name: 'Kage Bunshin no Jutsu',
+    description: 'Invoca um clone de sombra que avança contra o oponente. Caso atinja o inimigo, o clone o lança para cima (levantando-o no ar).',
+    imageSrc: '/images/basics/kage-bunshin.webp',
+    baseDamage: 60,
+    scalingAttribute: 'taijutsu',
+    scalingPercent: 0.15,
+    effects: [
+      {
+        type: 'debuff',
+        name: 'Levantamento (Knockup)',
+        description: 'O clone lança o inimigo para o alto, deixando-o vulnerável no ar por 1 segundo.',
+      },
+    ],
+  },
+  {
+    id: 'rasengan',
+    name: 'Rasengan',
+    description: 'Cria uma esfera de chakra rotativa concentrada na palma da mão que permite avançar rapidamente contra o inimigo. Ao atingir o alvo, o impacto causa dano massivo e joga o usuário para trás.',
+    imageSrc: '/images/basics/rasengan.webp',
+    baseDamage: 40,
+    scalingAttribute: 'ninjutsu',
+    scalingPercent: 0.4,
+    effects: [
+      {
+        type: 'special',
+        name: 'Impacto Repulsivo',
+        description: 'O impacto joga o usuário para trás e afasta o alvo.',
+      },
+    ],
+  },
+  {
+    id: 'kiru-no-chakra',
+    name: 'Kiru no Chakra',
+    description: 'Dispara cortes de chakra concentrado no ar, capazes de quebrar a defesa e a guarda do inimigo.',
+    imageSrc: '/images/basics/kiru-no-chakra.webp',
+    baseDamage: 120,
+    scalingAttribute: 'kenjutsu',
+    scalingPercent: 0.3,
+    effects: [
+      {
+        type: 'special',
+        name: 'Quebra de Guarda',
+        description: 'Dispara cortes de chakra que quebram a defesa inimiga.',
+      },
+    ],
+  },
+  {
+    id: 'kawarimi',
+    name: 'Kawarimi no Jutsu',
+    description: 'Técnica de substituição básica para evitar ataques diretos.',
+    imageSrc: '/images/basics/kawarimi.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Substituição',
+        description: 'Permite escapar de combos e jutsus inimigos.',
+      },
+    ],
+  },
+  {
+    id: 'henge',
+    name: 'Henge no Jutsu',
+    description: 'Transformação básica para enganar oponentes. Transforma a aparência na do alvo selecionado, consumindo chakra continuamente enquanto estiver ativo.',
+    imageSrc: '/images/basics/henge.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Cópia de Aparência',
+        description: 'Transforma o usuário na aparência do alvo selecionado. Consome chakra continuamente enquanto ativo.',
+      },
+    ],
+  },
+
+  {
+    id: 'shousen',
+    name: 'Shousen Jutsu',
+    description: 'Técnica de cura básica que recupera 19 pontos de vida base. A cura em si mesmo é reduzida em 50%. A cura escala com Ninjutsu de acordo com o nível da técnica.',
+    imageSrc: '/images/basics/shousen.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Cura Médica',
+        description: 'Escolha o nível ativo para aplicar a cura correspondente.',
+        levels: [
+          {
+            level: 1,
+            label: 'Nv. 1: Cura',
+            description: 'Recupera vida básica (+10% do Ninjutsu). A cura em si mesmo é reduzida em 50%.',
+          },
+          {
+            level: 2,
+            label: 'Nv. 2: Machucados',
+            description: 'Recupera vida (+15% do Ninjutsu) e cura machucados do alvo.',
+          },
+          {
+            level: 3,
+            label: 'Nv. 3: Fraturas',
+            description: 'Recupera vida (+20% do Ninjutsu) e cura fraturas do alvo.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'fuuinjutsu',
+    name: 'Fuuinjutsu',
+    description: 'Técnica de selamento que sela o player selecionado, restringindo suas ações.',
+    imageSrc: '/images/basics/fuuinjutsu.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Selar Alvo',
+        description: 'Sela as ações do inimigo selecionado.',
+      },
+    ],
+  },
+  {
+    id: 'kinobori',
+    name: 'Kinobori',
+    description: 'Concentra uma quantidade constante e precisa de chakra na sola dos pés, permitindo caminhar, correr e fixar-se livremente em paredes, árvores e superfícies verticais. Consome chakra continuamente enquanto está ativo.',
+    imageSrc: '/images/basics/kinobori.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Fixação de Superfície',
+        description: 'Caminha sobre superfícies verticais. Consome chakra continuamente enquanto ativo.',
+      },
+    ],
+  },
+  {
+    id: 'esquiva-aerea',
+    name: 'Esquiva Aérea',
+    description: 'Domina o controle corporal em pleno ar para realizar manobras rápidas e desvios precisos de projéteis e investidas inimigas enquanto está flutuando ou saltando.',
+    imageSrc: '/images/basics/esquiva-aerea.webp',
+  },
+  {
+    id: 'quebra-combos',
+    name: 'Quebra Combos',
+    description: 'Libera instantaneamente uma onda de chakra defensivo para repelir o oponente e interromper sequências consecutivas de golpes que o prenderam.',
+    imageSrc: '/images/basics/quebra-combos.webp',
+  },
+
+  {
+    id: 'pular-enquanto-esquiva',
+    name: 'Salto Evasivo',
+    description: 'Aprimora a mobilidade tática, permitindo emendar um salto explosivo em qualquer direção imediatamente após ou durante a execução de uma esquiva terrestre.',
+    imageSrc: '/images/basics/pular-enquanto-esquiva.webp',
+  },
+  {
+    id: 'katsuyu-katsu',
+    name: 'Katsuyu: Katsu',
+    description: 'Implanta pequenas divisões de Katsuyu nas costas do usuário. Ao entrar na área de influência da Katsuyu principal, essas lesmas curam 2% da vida máxima por segundo.',
+    imageSrc: '/images/basics/katsu.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Regeneração de Lesma',
+        description: 'Cura 2% da vida máxima por segundo ao entrar na área da Katsuyu.',
+      },
+    ],
+  },
+  {
+    id: 'katsuyu',
+    name: 'Kuchiyose: Katsuyu',
+    description: 'Invoca a lendária Rainha das Lesmas da Floresta Shikkotsu. Katsuyu cria um santuário de cura que regenera ativamente 5% da vida máxima por segundo de todos os aliados na área.',
+    imageSrc: '/images/basics/katsuyu.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Cura da Katsuyu',
+        description: 'Invoca a lesma Katsuyu para curar 5% da vida máxima por segundo.',
+      },
+    ],
+  },
+  {
+    id: 'urashi',
+    name: 'Kuchiyose: Urashi',
+    description: 'Invoca o cão ninja rastreador Urashi. Com seu faro apurado, ele localiza e expõe a posição exata do inimigo, marcando sua localização em tempo real no mapa.',
+    imageSrc: '/images/basics/urashi.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Rastreamento',
+        description: 'Rastreia e marca o inimigo selecionado no mapa.',
+      },
+    ],
+  },
+]
+
+export const BUFF_SKILLS: BuffSkill[] = [
+  {
+    id: 'samurai-saberu',
+    name: 'Samurai Saberu',
+    description: 'Técnicas de combate com sabre canalizando chakra. Encanta os ataques das armas, aumentando todo o dano físico das armas em 10%.',
+    imageSrc: '/images/basics/samurai-saberu.webp',
+    effects: [
+      {
+        type: 'buff',
+        name: 'Encantamento de Lâmina',
+        description: 'Aumenta o dano de armas em 10%.',
+        percentStats: { kenjutsu: 10 },
+      },
+    ],
+  },
+]
 
 export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
   hyuuga_souke: [
