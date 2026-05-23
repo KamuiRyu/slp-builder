@@ -718,15 +718,7 @@ function BuildShareCard({
       } satisfies Record<AttributeKey, number>,
     )
   const shareSkills = damageSkillGroups.flatMap((group) =>
-    group.skills.filter(skill => {
-      const selectedIds = [
-        ...build.selectedSkills.lineageSkillIds,
-        ...build.selectedSkills.elementalSkillIds,
-        ...build.selectedSkills.buffSkillIds,
-        ...build.selectedSkills.generalSkillIds
-      ]
-      return selectedIds.includes(skill.id)
-    })
+    group.skills.filter((skill) => skill.baseDamage !== undefined),
   )
 
   function hexToRgb(hex: string) {
