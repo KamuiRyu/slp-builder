@@ -193,6 +193,10 @@ export function BuilderForm({
 
   return (
     <div className="builder-form">
+      {/* Campos ocultos para persistência do avatar e reatividade */}
+      <input type="hidden" {...register('avatarId')} />
+      <input type="hidden" {...register('avatarImageIndex', { valueAsNumber: true })} />
+
       <section className="form-card identity-card">
         <span className="eyebrow">Ficha shinobi</span>
         <h2>Base da build</h2>
@@ -591,9 +595,15 @@ function AttributeRow({
       {hideSideValue ? (
         <span className="attribute-base" />
       ) : (
-        <span className="attribute-base">{sideValue}</span>
+        <span className="attribute-base">
+          <span className="mobile-label">Equip: </span>
+          {sideValue > 0 ? `+${sideValue}` : sideValue}
+        </span>
       )}
-      <output className="attribute-total">{totalValue}</output>
+      <output className="attribute-total">
+        <span className="mobile-label">Total: </span>
+        {totalValue}
+      </output>
     </div>
   )
 }

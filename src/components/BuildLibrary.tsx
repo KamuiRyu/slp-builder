@@ -12,11 +12,14 @@ import {
   AlertCircle,
   Info,
   Share2,
-  ChevronLeft,
-  ChevronRight,
+  ImageIcon,
+  Plus,
+  Palette,
+  Check,
 } from 'lucide-react'
+import Cropper from 'react-easy-crop'
 import { toPng } from 'html-to-image'
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useEffect, useRef, useState, useCallback, type CSSProperties, type RefObject } from 'react'
 import { BrandLogo } from './BrandLogo'
 import {
   ATTRIBUTE_LABELS,
@@ -32,7 +35,6 @@ import type { Equipment, EquipmentType } from '../types/equipment'
 import type { SavedBuild } from '../utils/localBuilds'
 import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
-import { NINJA_AVATARS, DEFAULT_AVATAR_IMAGE } from '../config/avatars'
 
 type BuildLibraryProps = {
   build: Build
@@ -51,17 +53,34 @@ type BuildLibraryProps = {
   onUpdateBuild: (field: any, value: any) => void
 }
 
+const THEME_PALETTE = [
+  // Oranges & Yellows (Naruto/Minato/Sun)
+  '#FF9800', '#F57C00', '#EF6C00', '#FFB74D', '#FDD835', '#FFEB3B', '#FFEE58',
+  // Blues (Uchiha/Water/Moon)
+  '#4A90E2', '#1976D2', '#1565C0', '#03A9F4', '#00BCD4', '#80DEEA', '#2196F3',
+  // Reds & Pinks (Akatsuki/Sakura/Will)
+  '#D32F2F', '#C62828', '#B71C1C', '#E53935', '#F06292', '#EC407A', '#F48FB1',
+  // Greens (Lee/Wood/Nature)
+  '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#8BC34A', '#CDDC39', '#AED581',
+  // Purples & Violets (Sound/Rinnegan/Spirit)
+  '#7B1FA2', '#6A1B9A', '#4A148C', '#9C27B0', '#9575CD', '#7E57C2', '#B39DDB',
+  // Browns & Grays (Sand/Earth/Cloud/Steel)
+  '#A1887F', '#8D6E63', '#6D4C41', '#4E342E', '#90A4AE', '#607D8B', '#424242'
+]
+
+const DEFAULT_AVATAR_IMAGE = '/images/elementals/unknown.png'
+
 const equipmentSlots: Array<{
   field: keyof Build['equipments']
   label: string
   type: EquipmentType
 }> = [
-  { field: 'weaponId', label: 'Arma', type: 'weapon' },
-  { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
-  { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
-  { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
-  { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
-]
+    { field: 'weaponId', label: 'Arma', type: 'weapon' },
+    { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
+    { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
+    { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
+    { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
+  ]
 
 const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
 
@@ -103,33 +122,70 @@ export function BuildLibrary({
   onDeleteBuild,
   onLoadBuild,
   onSaveBuild,
-  onUpdateBuild,
+  onUpdateBuild: _onUpdateBuild,
 }: BuildLibraryProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isShareOpen, setIsShareOpen] = useState(false)
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [randomAvatarId, setRandomAvatarId] = useState<string>('')
 
-  const selectedAvatarId = build.avatarId ?? 'random'
-  const selectedImageIndex = build.avatarImageIndex ?? 0
+  // Local state for Share Customization (not persisted in Build)
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null)
+  const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null)
+  const [shareThemeColor, setShareThemeColor] = useState(THEME_PALETTE[0])
+  const [isCropping, setIsCropping] = useState(false)
 
-  useEffect(() => {
-    if (isShareOpen && selectedAvatarId === 'random' && !randomAvatarId) {
-      const randomIndex = Math.floor(Math.random() * NINJA_AVATARS.length)
-      setRandomAvatarId(NINJA_AVATARS[randomIndex].id)
+  // Cropper state
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+
+  const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }, [])
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        setCustomImageUrl(reader.result as string)
+        setIsCropping(true)
+      }
+      reader.readAsDataURL(file)
     }
-  }, [isShareOpen, selectedAvatarId, randomAvatarId])
-
-  const activeAvatarId = selectedAvatarId === 'random' ? randomAvatarId : selectedAvatarId
-  const activeAvatar = NINJA_AVATARS.find((a) => a.id === activeAvatarId)
-  const activeAvatarImages = activeAvatar?.images ?? (activeAvatar ? [activeAvatar.imageSrc] : [])
-  const activeAvatarImgSrc = activeAvatarImages[selectedImageIndex] ?? activeAvatar?.imageSrc
-
-  function handleCycleAvatarImage() {
-    const nextIndex = (selectedImageIndex + 1) % activeAvatarImages.length
-    onUpdateBuild('avatarImageIndex', nextIndex)
   }
+
+  const createCroppedImage = useCallback(async () => {
+    if (!customImageUrl || !croppedAreaPixels) return
+
+    const image = new Image()
+    image.src = customImageUrl
+    await new Promise((resolve) => (image.onload = resolve))
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) return
+
+    canvas.width = croppedAreaPixels.width
+    canvas.height = croppedAreaPixels.height
+
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    )
+
+    setCroppedImageUrl(canvas.toDataURL('image/webp'))
+    setIsCropping(false)
+  }, [customImageUrl, croppedAreaPixels])
 
   const [toast, setToast] = useState<{
     title: string
@@ -137,56 +193,9 @@ export function BuildLibrary({
     type?: 'success' | 'info' | 'error' | 'delete'
   } | null>(null)
   const [previewScale, setPreviewScale] = useState(1)
-
   const shareCardRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-  const sliderRef = useRef<HTMLDivElement>(null)
   const toastTimeoutRef = useRef<number | undefined>(undefined)
-
-  const isDraggingRef = useRef(false)
-  const startXRef = useRef(0)
-  const scrollLeftRef = useRef(0)
-  const dragDistanceRef = useRef(0)
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!sliderRef.current) return
-    isDraggingRef.current = true
-    startXRef.current = e.pageX - sliderRef.current.offsetLeft
-    scrollLeftRef.current = sliderRef.current.scrollLeft
-    dragDistanceRef.current = 0
-  }
-
-  const handleMouseLeave = () => {
-    isDraggingRef.current = false
-  }
-
-  const handleMouseUp = () => {
-    // Keep a slight timeout before clearing drag distance to prevent click trigger
-    setTimeout(() => {
-      isDraggingRef.current = false
-    }, 50)
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current || !sliderRef.current) return
-    e.preventDefault()
-    const x = e.pageX - sliderRef.current.offsetLeft
-    const walk = (x - startXRef.current) * 1.5
-    dragDistanceRef.current = Math.abs(walk)
-    sliderRef.current.scrollLeft = scrollLeftRef.current - walk
-  }
-
-  const scrollLeft = () => {
-    if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: -220, behavior: 'smooth' })
-    }
-  }
-
-  const scrollRight = () => {
-    if (sliderRef.current) {
-      sliderRef.current.scrollBy({ left: 220, behavior: 'smooth' })
-    }
-  }
 
   useEffect(() => {
     return () => {
@@ -472,82 +481,106 @@ export function BuildLibrary({
               </button>
             </div>
 
-            <div className="avatar-slider-container">
-              <span className="theme-selector-label">Foto:</span>
-              <div className="avatar-slider-wrapper">
-                <button
-                  type="button"
-                  className="slider-nav-btn prev-btn"
-                  onClick={scrollLeft}
-                  aria-label="Ver avatares anteriores"
-                >
-                  <ChevronLeft aria-hidden="true" />
-                </button>
-                
-                <div
-                  className="theme-tabs avatars-tabs"
-                  ref={sliderRef}
-                  onMouseDown={handleMouseDown}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseUp={handleMouseUp}
-                  onMouseMove={handleMouseMove}
-                >
-                  <button
-                    type="button"
-                    className={`theme-tab-btn avatar-tab-btn ${selectedAvatarId === 'random' ? 'active' : ''}`}
-                    onClick={() => {
-                      if (dragDistanceRef.current > 10) return
-                      onUpdateBuild('avatarId', 'random')
-                      onUpdateBuild('avatarImageIndex', 0)
-                      const randomIndex = Math.floor(Math.random() * NINJA_AVATARS.length)
-                      setRandomAvatarId(NINJA_AVATARS[randomIndex].id)
-                    }}
-                  >
-                    <div className="avatar-mini-preview avatar-mini-random">?</div>
-                    <span>Aleatório</span>
-                  </button>
-                  {NINJA_AVATARS.map((avatar) => (
-                    <button
-                      key={avatar.id}
-                      type="button"
-                      className={`theme-tab-btn avatar-tab-btn ${selectedAvatarId === avatar.id ? 'active' : ''}`}
-                      onClick={() => {
-                        if (dragDistanceRef.current > 10) return
-                        onUpdateBuild('avatarId', avatar.id)
-                        onUpdateBuild('avatarImageIndex', 0)
-                      }}
-                    >
-                      <img
-                        className="avatar-mini-preview"
-                        src={getPublicAssetUrl(avatar.imageSrc)}
-                        alt={avatar.name}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
-                        }}
+            <div className="avatar-selection-sticky-group">
+              <div className="custom-share-controls">
+                <div className="share-control-block">
+                  <div className="variant-header">
+                    <ImageIcon size={14} />
+                    <span>Imagem do Shinobi:</span>
+                  </div>
+                  <div className="image-upload-wrapper">
+                    <label className="image-upload-btn">
+                      <Plus size={20} />
+                      Carregar Foto
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        hidden
                       />
-                      <span>{avatar.name.split(' ')[0]}</span>
-                    </button>
-                  ))}
+                    </label>
+                    {croppedImageUrl && (
+                      <div className="image-uploaded-preview">
+                        <img src={croppedImageUrl} alt="Preview" />
+                        <button 
+                          className="image-clear-btn" 
+                          onClick={() => { setCustomImageUrl(null); setCroppedImageUrl(null); }}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  className="slider-nav-btn next-btn"
-                  onClick={scrollRight}
-                  aria-label="Ver próximos avatares"
-                >
-                  <ChevronRight aria-hidden="true" />
-                </button>
+                <div className="share-control-block">
+                  <div className="variant-header">
+                    <Palette size={14} />
+                    <span>Cor do Tema:</span>
+                  </div>
+                  <div className="color-palette-grid">
+                    {THEME_PALETTE.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        className={`color-palette-btn ${shareThemeColor === color ? 'active' : ''}`}
+                        style={{ '--palette-color': color } as CSSProperties}
+                        onClick={() => setShareThemeColor(color)}
+                        title={color}
+                      >
+                        {shareThemeColor === color && <Check size={14} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {isCropping && customImageUrl && (
+              <div className="cropper-modal-overlay">
+                <div className="cropper-modal-content">
+                  <div className="cropper-header">
+                    <h3>Ajustar Imagem</h3>
+                    <button onClick={() => setIsCropping(false)}><X size={20} /></button>
+                  </div>
+                  <div className="cropper-container">
+                    <Cropper
+                      image={customImageUrl}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1} // Hexagon fits in 1:1
+                      onCropChange={setCrop}
+                      onCropComplete={onCropComplete}
+                      onZoomChange={setZoom}
+                    />
+                  </div>
+                  <div className="cropper-footer">
+                    <div className="zoom-control">
+                      <span>Zoom</span>
+                      <input
+                        type="range"
+                        value={zoom}
+                        min={1}
+                        max={3}
+                        step={0.1}
+                        onChange={(e) => setZoom(Number(e.target.value))}
+                      />
+                    </div>
+                    <button className="cropper-confirm-btn" onClick={createCroppedImage}>
+                      Confirmar Corte
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="share-card-stage" ref={stageRef}>
               <div
                 className="share-card-scaler"
                 style={{
                   width: `${1600 * previewScale}px`,
-                  height: `${1120 * previewScale}px`,
-                  overflow: 'hidden',
+                  height: `${1400 * previewScale}px`,
+                  overflow: 'visible',
                   position: 'relative',
                   margin: '0 auto',
                 }}
@@ -556,12 +589,10 @@ export function BuildLibrary({
                   className="share-card-wrapper"
                   style={{
                     width: '1600px',
-                    height: '1120px',
+                    height: '1400px',
                     transform: `scale(${previewScale})`,
                     transformOrigin: 'top left',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
+                    position: 'relative',
                   }}
                 >
                   <BuildShareCard
@@ -572,10 +603,9 @@ export function BuildLibrary({
                     finalStats={finalStats}
                     lineages={lineages}
                     cardRef={shareCardRef}
-                    theme={activeAvatarId}
+                    theme={shareThemeColor}
                     ranks={ranks}
-                    avatarImgSrc={activeAvatarImgSrc}
-                    onCycleImage={handleCycleAvatarImage}
+                    avatarImgSrc={croppedImageUrl || DEFAULT_AVATAR_IMAGE}
                   />
                 </div>
               </div>
@@ -635,7 +665,6 @@ type BuildShareCardProps = {
   theme: string
   ranks: Array<{ id: string; name: string }>
   avatarImgSrc?: string
-  onCycleImage?: () => void
 }
 
 function BuildShareCard({
@@ -649,7 +678,6 @@ function BuildShareCard({
   theme,
   ranks,
   avatarImgSrc,
-  onCycleImage,
 }: BuildShareCardProps) {
   const lineage = lineages.find((item) => item.id === build.lineageId)
   const element = elements.find((item) => item.id === build.elementIds[0])
@@ -683,8 +711,25 @@ function BuildShareCard({
       } satisfies Record<AttributeKey, number>,
     )
   const shareSkills = damageSkillGroups.flatMap((group) => group.skills)
+
+  function hexToRgb(hex: string) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result
+      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      : '255, 215, 71'
+  }
+
+  const activeAvatarThemeColor = theme.startsWith('#') ? theme : '#ffd747'
+
   return (
-    <div className={`share-card theme-${theme}`} ref={cardRef}>
+    <div
+      className="share-card"
+      ref={cardRef}
+      style={{
+        '--theme-accent': activeAvatarThemeColor,
+        '--theme-accent-rgb': hexToRgb(activeAvatarThemeColor)
+      } as CSSProperties}
+    >
       <div className="share-card-bg-logo">
         <BrandLogo />
       </div>
@@ -692,12 +737,7 @@ function BuildShareCard({
         <div className="share-card-meta">
           {avatarImgSrc && (
             <div className="share-hud-avatar-wrap">
-              <button
-                className="share-hud-avatar-frame"
-                onClick={onCycleImage}
-                title="Clique para trocar a imagem"
-                type="button"
-              >
+              <div className="share-hud-avatar-frame">
                 <img
                   className="share-hud-avatar-img"
                   alt="Avatar"
@@ -706,7 +746,7 @@ function BuildShareCard({
                     (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
                   }}
                 />
-              </button>
+              </div>
               {lineage?.imageSrc && (
                 <div className="share-hud-badge lineage-badge" title={`Linhagem: ${lineage.name}`}>
                   <img src={getPublicAssetUrl(lineage.imageSrc)} alt={lineage.name} />

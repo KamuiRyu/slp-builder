@@ -6,6 +6,8 @@ export type Build = {
   lineageId: string
   avatarId?: string
   avatarImageIndex?: number
+  avatarUrl?: string
+  customThemeColor?: string
   elementIds: [string, string?]
   attributes: Attributes
   training: TrainingAttributes

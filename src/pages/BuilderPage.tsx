@@ -239,7 +239,13 @@ export function BuilderPage() {
         onDeleteBuild={deleteSavedBuild}
         onLoadBuild={loadSavedBuild}
         onSaveBuild={saveCurrentBuild}
-        onUpdateBuild={(field, value) => form.setValue(field, value)}
+        onUpdateBuild={(field, value) =>
+          form.setValue(field, value, {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true,
+          })
+        }
         ranks={NINJA_RANKS}
         savedBuilds={savedBuilds}
       />

@@ -193,7 +193,7 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
           name: 'Disparo de Chakra',
           description: 'Permite lançar a energia dos leões gêmeos para atingir o alvo à distância.',
         }
-        
+
       ],
     },
   ],
@@ -225,8 +225,8 @@ export const LINEAGE_SKILLS: Record<string, LineageSkill[]> = {
       scalingPercent: 0.4,
     },
     {
-      id: 'juuho-soushiken',
-      name: 'Juuho Soushiken',
+      id: 'hakke-sanjuu-ni-shou',
+      name: 'Hakke Sanjuu Ni Shou',
       description: 'Executa uma sequência veloz e implacável de 32 golpes nos pontos de chakra (tenketsu) dos oponentes em área, causando dano massivo.',
       imageSrc: '/images/lineages/hyuuga-b-3.png',
       baseDamage: 150,
@@ -912,7 +912,7 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
         },
       ],
     }
-   
+
   ],
 
   lotus: [

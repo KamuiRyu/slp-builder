@@ -3,4 +3,5 @@ export type NinjaAvatar = {
   name: string
   imageSrc: string
   images?: string[]
+  themeColor?: string
 }
