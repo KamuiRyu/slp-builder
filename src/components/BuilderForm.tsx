@@ -47,7 +47,6 @@ type BuilderFormProps = {
   }>
   equipments: Equipment[]
   buffSkills: BuffSkill[]
-  generalSkills: BuffSkill[]
 }
 
 const equipmentSlots: Array<{
@@ -102,7 +101,6 @@ export function BuilderForm({
   ranks,
   equipments,
   buffSkills,
-  generalSkills
 }: BuilderFormProps) {
   const activeRank = ranks.find((rank) => rank.id === build.rankId) ?? ranks[0]
   const distributedPoints = calculateDistributedPoints(build.attributes)
@@ -177,23 +175,6 @@ export function BuilderForm({
     const firstLevel = getSkillLevels(skill)[0]?.level
 
     updateFieldValue('selectedSkills.buffSkillIds', nextIds)
-
-    if (checked && firstLevel && !build.skillLevels[skill.id]) {
-      updateFieldValue('skillLevels', {
-        ...build.skillLevels,
-        [skill.id]: firstLevel,
-      })
-    }
-  }
-
-  function toggleGeneralSkill(skill: BuffSkill, checked: boolean) {
-    const selectedIds = build.selectedSkills.generalSkillIds
-    const nextIds = checked
-      ? [...selectedIds, skill.id]
-      : selectedIds.filter((skillId) => skillId !== skill.id)
-    const firstLevel = getSkillLevels(skill)[0]?.level
-
-    updateFieldValue('selectedSkills.generalSkillIds', nextIds)
 
     if (checked && firstLevel && !build.skillLevels[skill.id]) {
       updateFieldValue('skillLevels', {

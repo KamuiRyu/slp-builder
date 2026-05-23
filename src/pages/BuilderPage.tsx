@@ -90,9 +90,9 @@ function normalizeBuild(build: LegacyPersistedBuild): Build {
     },
     equipments: {
       weaponId: build.equipments?.weaponId,
-      equipment1Id: build.equipments?.equipment1Id ?? (build.equipments as any)?.armorId,
+      equipment1Id: build.equipments?.equipment1Id ?? (build.equipments as Record<string, string | undefined>)?.armorId,
       equipment2Id: build.equipments?.equipment2Id,
-      bandanaId: build.equipments?.bandanaId ?? (build.equipments as any)?.accessoryId,
+      bandanaId: build.equipments?.bandanaId ?? (build.equipments as Record<string, string | undefined>)?.accessoryId,
       ninjaToolId: build.equipments?.ninjaToolId,
     },
     selectedSkills: {
@@ -213,7 +213,6 @@ export function BuilderPage() {
         <BuilderForm
           build={build}
           buffSkills={availableBuffSkills}
-          generalSkills={GENERAL_SKILLS.filter((skill) => skill.effects && skill.effects.length > 0)}
           elements={ELEMENTS}
           equipments={EQUIPMENTS}
           errors={form.formState.errors}
@@ -248,13 +247,6 @@ export function BuilderPage() {
         onDeleteBuild={deleteSavedBuild}
         onLoadBuild={loadSavedBuild}
         onSaveBuild={saveCurrentBuild}
-        onUpdateBuild={(field, value) =>
-          form.setValue(field, value, {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-          })
-        }
         ranks={NINJA_RANKS}
         savedBuilds={savedBuilds}
       />

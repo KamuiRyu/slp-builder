@@ -50,7 +50,6 @@ type BuildLibraryProps = {
   onDeleteBuild: (buildId: string) => void
   onLoadBuild: (build: Build) => void
   onSaveBuild: () => void
-  onUpdateBuild: (field: any, value: any) => void
 }
 
 const THEME_PALETTE = [
@@ -110,6 +109,13 @@ const MINI_ATTR_LABELS: Record<string, string> = {
 }
 
 
+interface CropArea {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export function BuildLibrary({
   build,
   damageSkillGroups,
@@ -124,7 +130,6 @@ export function BuildLibrary({
   onDeleteBuild,
   onLoadBuild,
   onSaveBuild,
-  onUpdateBuild: _onUpdateBuild,
 }: BuildLibraryProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isShareOpen, setIsShareOpen] = useState(false)
@@ -140,9 +145,9 @@ export function BuildLibrary({
   // Cropper state
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(null)
 
-  const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+  const onCropComplete = useCallback((_croppedArea: CropArea, croppedAreaPixels: CropArea) => {
     setCroppedAreaPixels(croppedAreaPixels)
   }, [])
 
@@ -504,8 +509,8 @@ export function BuildLibrary({
                     {croppedImageUrl && (
                       <div className="image-uploaded-preview">
                         <img src={croppedImageUrl} alt="Preview" />
-                        <button 
-                          className="image-clear-btn" 
+                        <button
+                          className="image-clear-btn"
                           onClick={() => { setCustomImageUrl(null); setCroppedImageUrl(null); }}
                         >
                           <X size={12} />
@@ -712,7 +717,7 @@ function BuildShareCard({
         kenjutsu: 0,
       } satisfies Record<AttributeKey, number>,
     )
-  const shareSkills = damageSkillGroups.flatMap((group) => 
+  const shareSkills = damageSkillGroups.flatMap((group) =>
     group.skills.filter(skill => {
       const selectedIds = [
         ...build.selectedSkills.lineageSkillIds,
@@ -843,10 +848,10 @@ function BuildShareCard({
                   skill.baseDamage !== undefined
                     ? hasScaling && skill.scalingAttribute
                       ? calculateDamage(
-                          skill.baseDamage,
-                          finalStats[skill.scalingAttribute],
-                          skill.scalingPercent!,
-                        )
+                        skill.baseDamage,
+                        finalStats[skill.scalingAttribute],
+                        skill.scalingPercent!,
+                      )
                       : skill.baseDamage
                     : null
                 const scalingLabel =
