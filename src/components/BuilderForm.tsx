@@ -49,21 +49,16 @@ type BuilderFormProps = {
   buffSkills: BuffSkill[]
 }
 
-const equipmentLabels: Record<EquipmentType, string> = {
-  weapon: 'Arma',
-  armor: 'Armadura',
-  accessory: 'Acessório',
-  ninjaTool: 'Ferramenta ninja',
-}
-
-const equipmentFields: Array<{
-  type: EquipmentType
+const equipmentSlots: Array<{
   field: keyof Build['equipments']
+  label: string
+  type: EquipmentType
 }> = [
-  { type: 'weapon', field: 'weaponId' },
-  { type: 'armor', field: 'armorId' },
-  { type: 'accessory', field: 'accessoryId' },
-  { type: 'ninjaTool', field: 'ninjaToolId' },
+  { field: 'weaponId', label: 'Arma', type: 'weapon' },
+  { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
+  { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
+  { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
+  { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
 ]
 
 const DIGITS_ONLY_REGEX = /\D/g
@@ -109,15 +104,16 @@ export function BuilderForm({
 }: BuilderFormProps) {
   const activeRank = ranks.find((rank) => rank.id === build.rankId) ?? ranks[0]
   const distributedPoints = calculateDistributedPoints(build.attributes)
-  const equipmentBonuses = equipments
-    .filter((equipment) =>
-      Object.values(build.equipments).includes(equipment.id),
-    )
+  const equipmentBonuses = Object.values(build.equipments)
+    .filter((id): id is string => Boolean(id))
     .reduce(
-      (bonuses, equipment) => {
-        for (const [attribute, value] of Object.entries(equipment.stats ?? {})) {
-          const key = attribute as AttributeKey
-          bonuses[key] += convertAttributePointsToStat(key, value ?? 0)
+      (bonuses, id) => {
+        const equipment = equipments.find((e) => e.id === id)
+        if (equipment?.stats) {
+          for (const [attribute, value] of Object.entries(equipment.stats)) {
+            const key = attribute as AttributeKey
+            bonuses[key] += convertAttributePointsToStat(key, value ?? 0)
+          }
         }
 
         return bonuses
@@ -410,38 +406,60 @@ export function BuilderForm({
         <span className="eyebrow">Equipamento</span>
         <h2>Equipamentos</h2>
         <div className="field-grid">
-          {equipmentFields.map(({ type, field }) => (
-            <Label key={type}>
-              {equipmentLabels[type]}
-              <Select
-                onValueChange={(value) =>
-                  updateFieldValue(
-                    `equipments.${field}`,
-                    value === EMPTY_SELECT_VALUE ? undefined : value,
-                  )
-                }
-                value={build.equipments[field] ?? EMPTY_SELECT_VALUE}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Nenhum" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={EMPTY_SELECT_VALUE}>Nenhum</SelectItem>
-                  {equipments
-                    .filter((equipment) => equipment.type === type)
-                    .map((equipment) => (
-                      <SelectItem key={equipment.id} value={equipment.id}>
-                        <SelectOptionMedia
-                          imageSrc={equipment.imageSrc}
-                          name={equipment.name}
-                          subtitle={formatEquipmentStats(equipment)}
-                        />
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </Label>
-          ))}
+          {equipmentSlots.map(({ field, label, type }) => {
+            const otherEquipmentId =
+              field === 'equipment1Id'
+                ? build.equipments.equipment2Id
+                : field === 'equipment2Id'
+                  ? build.equipments.equipment1Id
+                  : undefined
+
+            const isOtherHat =
+              otherEquipmentId === 'hat' ||
+              (otherEquipmentId !== undefined && otherEquipmentId.endsWith('-hat'))
+
+            return (
+              <Label key={field}>
+                {label}
+                <Select
+                  onValueChange={(value) =>
+                    updateFieldValue(
+                      `equipments.${field}`,
+                      value === EMPTY_SELECT_VALUE ? undefined : value,
+                    )
+                  }
+                  value={build.equipments[field] ?? EMPTY_SELECT_VALUE}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Nenhum" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>Nenhum</SelectItem>
+                    {equipments
+                      .filter((equipment) => {
+                        if (equipment.type !== type) return false
+                        if (equipment.id === otherEquipmentId) return false
+
+                        const isCurrentHat =
+                          equipment.id === 'hat' || equipment.id.endsWith('-hat')
+                        if (isOtherHat && isCurrentHat) return false
+
+                        return true
+                      })
+                      .map((equipment) => (
+                        <SelectItem key={equipment.id} value={equipment.id}>
+                          <SelectOptionMedia
+                            imageSrc={equipment.imageSrc}
+                            name={equipment.name}
+                            subtitle={formatEquipmentStats(equipment)}
+                          />
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </Label>
+            )
+          })}
         </div>
       </section>
     </div>

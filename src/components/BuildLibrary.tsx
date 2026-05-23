@@ -12,6 +12,8 @@ import {
   AlertCircle,
   Info,
   Share2,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { toPng } from 'html-to-image'
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
@@ -46,24 +48,20 @@ type BuildLibraryProps = {
   onDeleteBuild: (buildId: string) => void
   onLoadBuild: (build: Build) => void
   onSaveBuild: () => void
+  onUpdateBuild: (field: any, value: any) => void
 }
 
-const equipmentLabels: Record<EquipmentType, string> = {
-  weapon: 'Arma',
-  armor: 'Armadura',
-  accessory: 'Acessório',
-  ninjaTool: 'Ferramenta ninja',
-}
-
-const equipmentFields: Array<{
-  type: EquipmentType
+const equipmentSlots: Array<{
   field: keyof Build['equipments']
+  label: string
+  type: EquipmentType
 }> = [
-    { type: 'weapon', field: 'weaponId' },
-    { type: 'armor', field: 'armorId' },
-    { type: 'accessory', field: 'accessoryId' },
-    { type: 'ninjaTool', field: 'ninjaToolId' },
-  ]
+  { field: 'weaponId', label: 'Arma', type: 'weapon' },
+  { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
+  { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
+  { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
+  { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
+]
 
 const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
 
@@ -90,13 +88,6 @@ const MINI_ATTR_LABELS: Record<string, string> = {
   kenjutsu: 'Ken',
 }
 
-const CARD_THEMES = [
-  { id: 'dark', name: 'Dark Forge' },
-  { id: 'scroll', name: 'Pergaminho' },
-  { id: 'akatsuki', name: 'Akatsuki' },
-  { id: 'sage', name: 'Sábio' },
-  { id: 'chakra', name: 'Chakra' },
-]
 
 export function BuildLibrary({
   build,
@@ -112,13 +103,34 @@ export function BuildLibrary({
   onDeleteBuild,
   onLoadBuild,
   onSaveBuild,
+  onUpdateBuild,
 }: BuildLibraryProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isShareOpen, setIsShareOpen] = useState(false)
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeCardTheme, setActiveCardTheme] = useState('dark')
-  const [selectedAvatarId, setSelectedAvatarId] = useState(NINJA_AVATARS[0].id)
+  const [randomAvatarId, setRandomAvatarId] = useState<string>('')
+
+  const selectedAvatarId = build.avatarId ?? 'random'
+  const selectedImageIndex = build.avatarImageIndex ?? 0
+
+  useEffect(() => {
+    if (isShareOpen && selectedAvatarId === 'random' && !randomAvatarId) {
+      const randomIndex = Math.floor(Math.random() * NINJA_AVATARS.length)
+      setRandomAvatarId(NINJA_AVATARS[randomIndex].id)
+    }
+  }, [isShareOpen, selectedAvatarId, randomAvatarId])
+
+  const activeAvatarId = selectedAvatarId === 'random' ? randomAvatarId : selectedAvatarId
+  const activeAvatar = NINJA_AVATARS.find((a) => a.id === activeAvatarId)
+  const activeAvatarImages = activeAvatar?.images ?? (activeAvatar ? [activeAvatar.imageSrc] : [])
+  const activeAvatarImgSrc = activeAvatarImages[selectedImageIndex] ?? activeAvatar?.imageSrc
+
+  function handleCycleAvatarImage() {
+    const nextIndex = (selectedImageIndex + 1) % activeAvatarImages.length
+    onUpdateBuild('avatarImageIndex', nextIndex)
+  }
+
   const [toast, setToast] = useState<{
     title: string
     description: string
@@ -128,7 +140,53 @@ export function BuildLibrary({
 
   const shareCardRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
+  const sliderRef = useRef<HTMLDivElement>(null)
   const toastTimeoutRef = useRef<number | undefined>(undefined)
+
+  const isDraggingRef = useRef(false)
+  const startXRef = useRef(0)
+  const scrollLeftRef = useRef(0)
+  const dragDistanceRef = useRef(0)
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!sliderRef.current) return
+    isDraggingRef.current = true
+    startXRef.current = e.pageX - sliderRef.current.offsetLeft
+    scrollLeftRef.current = sliderRef.current.scrollLeft
+    dragDistanceRef.current = 0
+  }
+
+  const handleMouseLeave = () => {
+    isDraggingRef.current = false
+  }
+
+  const handleMouseUp = () => {
+    // Keep a slight timeout before clearing drag distance to prevent click trigger
+    setTimeout(() => {
+      isDraggingRef.current = false
+    }, 50)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingRef.current || !sliderRef.current) return
+    e.preventDefault()
+    const x = e.pageX - sliderRef.current.offsetLeft
+    const walk = (x - startXRef.current) * 1.5
+    dragDistanceRef.current = Math.abs(walk)
+    sliderRef.current.scrollLeft = scrollLeftRef.current - walk
+  }
+
+  const scrollLeft = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: -220, behavior: 'smooth' })
+    }
+  }
+
+  const scrollRight = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: 220, behavior: 'smooth' })
+    }
+  }
 
   useEffect(() => {
     return () => {
@@ -414,43 +472,72 @@ export function BuildLibrary({
               </button>
             </div>
 
-            <div className="theme-selector-bar">
-              <span className="theme-selector-label">Tema:</span>
-              <div className="theme-tabs">
-                {CARD_THEMES.map((theme) => (
-                  <button
-                    key={theme.id}
-                    type="button"
-                    className={`theme-tab-btn ${activeCardTheme === theme.id ? 'active' : ''}`}
-                    onClick={() => setActiveCardTheme(theme.id)}
-                  >
-                    {theme.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="theme-selector-bar">
+            <div className="avatar-slider-container">
               <span className="theme-selector-label">Foto:</span>
-              <div className="theme-tabs avatars-tabs">
-                {NINJA_AVATARS.map((avatar) => (
+              <div className="avatar-slider-wrapper">
+                <button
+                  type="button"
+                  className="slider-nav-btn prev-btn"
+                  onClick={scrollLeft}
+                  aria-label="Ver avatares anteriores"
+                >
+                  <ChevronLeft aria-hidden="true" />
+                </button>
+                
+                <div
+                  className="theme-tabs avatars-tabs"
+                  ref={sliderRef}
+                  onMouseDown={handleMouseDown}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseUp={handleMouseUp}
+                  onMouseMove={handleMouseMove}
+                >
                   <button
-                    key={avatar.id}
                     type="button"
-                    className={`theme-tab-btn avatar-tab-btn ${selectedAvatarId === avatar.id ? 'active' : ''}`}
-                    onClick={() => setSelectedAvatarId(avatar.id)}
+                    className={`theme-tab-btn avatar-tab-btn ${selectedAvatarId === 'random' ? 'active' : ''}`}
+                    onClick={() => {
+                      if (dragDistanceRef.current > 10) return
+                      onUpdateBuild('avatarId', 'random')
+                      onUpdateBuild('avatarImageIndex', 0)
+                      const randomIndex = Math.floor(Math.random() * NINJA_AVATARS.length)
+                      setRandomAvatarId(NINJA_AVATARS[randomIndex].id)
+                    }}
                   >
-                    <img
-                      className="avatar-mini-preview"
-                      src={getPublicAssetUrl(avatar.imageSrc)}
-                      alt={avatar.name}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
-                      }}
-                    />
-                    {avatar.name}
+                    <div className="avatar-mini-preview avatar-mini-random">?</div>
+                    <span>Aleatório</span>
                   </button>
-                ))}
+                  {NINJA_AVATARS.map((avatar) => (
+                    <button
+                      key={avatar.id}
+                      type="button"
+                      className={`theme-tab-btn avatar-tab-btn ${selectedAvatarId === avatar.id ? 'active' : ''}`}
+                      onClick={() => {
+                        if (dragDistanceRef.current > 10) return
+                        onUpdateBuild('avatarId', avatar.id)
+                        onUpdateBuild('avatarImageIndex', 0)
+                      }}
+                    >
+                      <img
+                        className="avatar-mini-preview"
+                        src={getPublicAssetUrl(avatar.imageSrc)}
+                        alt={avatar.name}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
+                        }}
+                      />
+                      <span>{avatar.name.split(' ')[0]}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  className="slider-nav-btn next-btn"
+                  onClick={scrollRight}
+                  aria-label="Ver próximos avatares"
+                >
+                  <ChevronRight aria-hidden="true" />
+                </button>
               </div>
             </div>
 
@@ -485,9 +572,10 @@ export function BuildLibrary({
                     finalStats={finalStats}
                     lineages={lineages}
                     cardRef={shareCardRef}
-                    theme={activeCardTheme}
+                    theme={activeAvatarId}
                     ranks={ranks}
-                    avatarImgSrc={NINJA_AVATARS.find((a) => a.id === selectedAvatarId)?.imageSrc}
+                    avatarImgSrc={activeAvatarImgSrc}
+                    onCycleImage={handleCycleAvatarImage}
                   />
                 </div>
               </div>
@@ -547,6 +635,7 @@ type BuildShareCardProps = {
   theme: string
   ranks: Array<{ id: string; name: string }>
   avatarImgSrc?: string
+  onCycleImage?: () => void
 }
 
 function BuildShareCard({
@@ -560,24 +649,26 @@ function BuildShareCard({
   theme,
   ranks,
   avatarImgSrc,
+  onCycleImage,
 }: BuildShareCardProps) {
   const lineage = lineages.find((item) => item.id === build.lineageId)
   const element = elements.find((item) => item.id === build.elementIds[0])
   const rank = ranks.find((item) => item.id === build.rankId)
-  const selectedEquipments = equipmentFields.map(({ type, field }) => ({
+  const selectedEquipments = equipmentSlots.map(({ field, label, type }) => ({
     type,
-    label: equipmentLabels[type],
+    label,
     equipment: equipments.find((item) => item.id === build.equipments[field]),
   }))
-  const equipmentBonuses = equipments
-    .filter((equipment) =>
-      Object.values(build.equipments).includes(equipment.id),
-    )
+  const equipmentBonuses = Object.values(build.equipments)
+    .filter((id): id is string => Boolean(id))
     .reduce(
-      (bonuses, equipment) => {
-        for (const [attribute, value] of Object.entries(equipment.stats ?? {})) {
-          const key = attribute as AttributeKey
-          bonuses[key] += value ?? 0
+      (bonuses, id) => {
+        const equipment = equipments.find((e) => e.id === id)
+        if (equipment?.stats) {
+          for (const [attribute, value] of Object.entries(equipment.stats)) {
+            const key = attribute as AttributeKey
+            bonuses[key] += value ?? 0
+          }
         }
 
         return bonuses
@@ -594,12 +685,19 @@ function BuildShareCard({
   const shareSkills = damageSkillGroups.flatMap((group) => group.skills)
   return (
     <div className={`share-card theme-${theme}`} ref={cardRef}>
-      <div className="share-card-header">
+      <div className="share-card-bg-logo">
         <BrandLogo />
+      </div>
+      <div className="share-card-header">
         <div className="share-card-meta">
           {avatarImgSrc && (
             <div className="share-hud-avatar-wrap">
-              <div className="share-hud-avatar-frame">
+              <button
+                className="share-hud-avatar-frame"
+                onClick={onCycleImage}
+                title="Clique para trocar a imagem"
+                type="button"
+              >
                 <img
                   className="share-hud-avatar-img"
                   alt="Avatar"
@@ -608,14 +706,22 @@ function BuildShareCard({
                     (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
                   }}
                 />
-              </div>
+              </button>
+              {lineage?.imageSrc && (
+                <div className="share-hud-badge lineage-badge" title={`Linhagem: ${lineage.name}`}>
+                  <img src={getPublicAssetUrl(lineage.imageSrc)} alt={lineage.name} />
+                </div>
+              )}
+              {element?.imageSrc && (
+                <div className="share-hud-badge element-badge" title={`Elemento: ${element.name}`}>
+                  <img src={getPublicAssetUrl(element.imageSrc)} alt={element.name} />
+                </div>
+              )}
             </div>
           )}
           <div className="share-card-name-block">
             <div className="share-card-name-row">
               <strong>{build.name || 'Shinobi sem nome'}</strong>
-              <ShareImage imageSrc={lineage?.imageSrc} label="Linhagem" />
-              <ShareImage imageSrc={element?.imageSrc} label="Elemento" />
             </div>
             <span className="share-card-rank">{rank?.name ?? 'Graduação'}</span>
             <div className="share-card-stats-hud">
@@ -1047,15 +1153,3 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
   )
 }
 
-type ShareImageProps = {
-  imageSrc?: string
-  label: string
-}
-
-function ShareImage({ imageSrc, label }: ShareImageProps) {
-  return (
-    <div className="share-origin-image" title={label}>
-      <img alt={label} src={getPublicAssetUrl(imageSrc ?? UNKNOWN_IMAGE)} />
-    </div>
-  )
-}

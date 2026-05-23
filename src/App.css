@@ -1603,7 +1603,7 @@
 
 .share-card-header {
   display: grid;
-  grid-template-columns: 180px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 28px;
   height: 156px;
@@ -1927,7 +1927,8 @@
 .share-equipment.slot-weapon {
   --slot-color: #ff4d5f;
 }
-.share-equipment.slot-armor {
+.share-equipment.slot-armor,
+.share-equipment.slot-equipment {
   --slot-color: #4aa3ff;
 }
 .share-equipment.slot-accessory {
@@ -3978,87 +3979,558 @@ small,
   box-shadow: none;
 }
 
-/* Avatar Tabs and Selection in Share Modal */
+/* Avatar Tabs Slider and Selection in Share Modal */
+.avatar-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  background: var(--field);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.avatar-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 40px; /* Space for navigation buttons */
+}
+
+/* Slider Nav Buttons */
+.slider-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(12, 18, 24, 0.85);
+  border: 1px solid var(--border);
+  color: var(--text-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+}
+
+.slider-nav-btn:hover {
+  background: var(--theme-accent, var(--violet));
+  border-color: var(--theme-accent, var(--violet));
+  color: #ffffff;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--theme-accent, var(--violet)) 50%, transparent);
+}
+
+.slider-nav-btn.prev-btn {
+  left: 0;
+}
+
+.slider-nav-btn.next-btn {
+  right: 0;
+}
+
+.slider-nav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .avatars-tabs {
   overflow-x: auto !important;
   flex-wrap: nowrap !important;
   max-width: 100%;
-  padding-bottom: 6px;
-  /* Custom scrollbar */
-  scrollbar-width: thin;
+  padding: 8px 6px !important;
+  gap: 12px !important;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Hide scrollbar */
+  cursor: grab;
+  user-select: none;
+}
+
+.avatars-tabs:active {
+  cursor: grabbing;
 }
 
 .avatars-tabs::-webkit-scrollbar {
-  height: 4px;
-}
-
-.avatars-tabs::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 2px;
-}
-
-.avatars-tabs::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
-}
-
-.avatars-tabs::-webkit-scrollbar-thumb:hover {
-  background: var(--violet);
+  display: none; /* Hide scrollbar for Chrome/Safari */
 }
 
 .avatar-tab-btn {
-  display: inline-flex !important;
+  display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 8px !important;
+  padding: 8px !important;
+  width: 80px !important;
+  height: 94px !important;
   flex-shrink: 0 !important;
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 6px !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+}
+
+.avatar-tab-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.avatar-tab-btn.active {
+  border-color: var(--theme-accent, var(--violet)) !important;
+  background: color-mix(in srgb, var(--theme-accent, var(--violet)) 8%, rgba(0, 0, 0, 0.35)) !important;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--theme-accent, var(--violet)) 30%, transparent) !important;
+}
+
+.avatar-tab-btn span {
+  font-family: var(--mono) !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.avatar-tab-btn.active span {
+  color: var(--theme-accent, #ffffff) !important;
 }
 
 .avatar-mini-preview {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.4);
+  width: 48px !important;
+  height: 48px !important;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  padding: 2px !important; /* border simulation */
+  object-fit: cover !important;
+  border-radius: 0 !important;
+  border: none !important;
+  transition: background-color 0.2s ease !important;
 }
 
-/* HUD Avatar Frame on Share Card */
+.avatar-tab-btn.active .avatar-mini-preview {
+  background: var(--theme-accent, var(--violet)) !important;
+}
+
+.avatar-mini-random {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, #1f2937, #111827) !important;
+  color: #fbbf24 !important;
+  font-family: var(--mono) !important;
+  font-size: 18px !important;
+  font-weight: 950 !important;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%) !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+/* HUD Avatar Frame on Share Card (Hexagonal Style) */
 .share-hud-avatar-wrap {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   width: 112px;
   height: 112px;
+  margin-right: 8px;
+  filter: 
+    drop-shadow(0 0 10px var(--theme-accent, var(--cyan)))
+    drop-shadow(0 6px 12px rgba(0, 0, 0, 0.7));
 }
 
 .share-hud-avatar-frame {
   width: 112px;
   height: 112px;
-  border-radius: 50%;
-  border: 3.5px solid var(--theme-accent, var(--cyan));
-  overflow: hidden;
-  position: relative;
+  background: var(--theme-accent, var(--cyan));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 
-    0 0 16px rgba(0, 0, 0, 0.55),
-    0 0 14px var(--theme-accent, var(--cyan));
-  background: rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  position: relative;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.share-hud-avatar-frame:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
+
+.share-hud-avatar-frame:active {
+  transform: scale(0.95);
 }
 
 .share-hud-avatar-img {
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
   object-fit: cover;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }
 
 /* Scroll theme overrides */
+.share-card.theme-scroll .share-hud-avatar-wrap {
+  filter: drop-shadow(0 6px 12px rgba(109, 76, 65, 0.25)) !important;
+}
+
 .share-card.theme-scroll .share-hud-avatar-frame {
-  border-color: #5d4037;
-  box-shadow: none;
-  background: rgba(109, 76, 65, 0.05);
+  background: #5d4037 !important;
+}
+
+
+
+
+/* Background Watermark Logo for Share Card */
+.share-card-bg-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 750px;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.share-card-bg-logo .brand-logo {
+  width: 100%;
+}
+
+.share-card-bg-logo .brand-logo-image {
+  width: 100% !important;
+  height: auto;
+  filter: grayscale(1) brightness(1.3) !important;
+}
+
+.share-card-header,
+.share-card-grid,
+.share-card-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Character Specific Watermark Filters */
+.share-card.theme-naruto .share-card-bg-logo {
+  opacity: 0.08;
+}
+.share-card.theme-naruto .share-card-bg-logo .brand-logo-image {
+  filter: sepia(1) saturate(5) hue-rotate(-15deg) brightness(0.9) !important;
+}
+
+.share-card.theme-sasuke .share-card-bg-logo {
+  opacity: 0.08;
+}
+.share-card.theme-sasuke .share-card-bg-logo .brand-logo-image {
+  filter: hue-rotate(240deg) saturate(3.5) brightness(0.85) !important;
+}
+
+.share-card.theme-sakura .share-card-bg-logo {
+  opacity: 0.08;
+}
+.share-card.theme-sakura .share-card-bg-logo .brand-logo-image {
+  filter: hue-rotate(300deg) saturate(3.5) brightness(0.9) !important;
+}
+
+.share-card.theme-kakashi .share-card-bg-logo {
+  opacity: 0.09;
+}
+.share-card.theme-kakashi .share-card-bg-logo .brand-logo-image {
+  filter: hue-rotate(140deg) saturate(3.5) brightness(0.85) !important;
+}
+
+.share-card.theme-itachi .share-card-bg-logo {
+  opacity: 0.09;
+}
+.share-card.theme-itachi .share-card-bg-logo .brand-logo-image {
+  filter: sepia(0.5) hue-rotate(0deg) saturate(5) brightness(0.7) !important;
+}
+
+.share-card.theme-madara .share-card-bg-logo {
+  opacity: 0.08;
+}
+.share-card.theme-madara .share-card-bg-logo .brand-logo-image {
+  filter: hue-rotate(220deg) saturate(4) brightness(0.75) !important;
+}
+
+.share-card.theme-minato .share-card-bg-logo {
+  opacity: 0.09;
+}
+.share-card.theme-minato .share-card-bg-logo .brand-logo-image {
+  filter: sepia(1) saturate(5) hue-rotate(15deg) brightness(1.05) !important;
+}
+
+.share-card.theme-gaara .share-card-bg-logo {
+  opacity: 0.09;
+}
+.share-card.theme-gaara .share-card-bg-logo .brand-logo-image {
+  filter: sepia(0.85) saturate(3.5) hue-rotate(10deg) brightness(0.7) !important;
+}
+
+.share-card.theme-scroll .share-card-bg-logo {
+  opacity: 0.055;
+}
+.share-card.theme-scroll .share-card-bg-logo .brand-logo-image {
+  filter: grayscale(1) brightness(0.18) !important;
+}
+
+
+/* HUD Badges overlapping the Avatar */
+
+.share-hud-badge {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(12, 18, 24, 0.92);
+  border: 2px solid var(--theme-accent, var(--cyan));
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.7), 
+    0 0 8px var(--theme-accent, var(--cyan));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.share-hud-badge img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.share-hud-badge.lineage-badge {
+  bottom: -4px;
+  left: -4px;
+}
+
+.share-hud-badge.element-badge {
+  bottom: -4px;
+  right: -4px;
+}
+
+/* Slanted HUD Status Bars */
+.share-hud-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 250px;
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 4px !important;
+  padding: 5px 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+  transform: skewX(-14deg);
+  overflow: visible;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.share-hud-bar.hp-bar {
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.5), 
+    0 0 10px rgba(16, 185, 129, 0.15) !important;
+}
+
+.share-hud-bar.cp-bar {
+  border-color: rgba(6, 182, 212, 0.35) !important;
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.5), 
+    0 0 10px rgba(6, 182, 212, 0.15) !important;
+}
+
+.share-hud-bar .hud-label {
+  font-family: var(--mono) !important;
+  font-size: 12px !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.05em !important;
+  flex-shrink: 0;
+  transform: skewX(14deg); /* Skews text back so it is upright */
+  text-shadow: 0 0 6px currentColor;
+}
+
+.share-hud-bar .hud-track {
+  height: 10px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 2px !important;
+}
+
+.share-hud-bar .hud-fill {
+  border-radius: 2px !important;
+}
+
+.share-hud-bar .hud-value {
+  font-family: var(--mono) !important;
+  font-size: 13px !important;
+  font-weight: 950 !important;
+  color: #ffffff !important;
+  min-width: 38px;
+  text-align: right;
+  transform: skewX(14deg); /* Skews value back so it is upright */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Character Themes */
+.share-card.theme-naruto {
+  --theme-accent: #f97316;
+  background:
+    linear-gradient(90deg, rgba(12, 18, 24, 0.96), rgba(18, 24, 32, 0.9)),
+    radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.2), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(251, 191, 36, 0.16), transparent 25%),
+    #0b1118;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(249, 115, 22, 0.35),
+    0 0 45px rgba(249, 115, 22, 0.15);
+}
+.share-card.theme-naruto .share-card-title,
+.share-card.theme-naruto .share-card-name-row strong {
+  color: #f97316;
+  text-shadow: 0 0 15px rgba(249, 115, 22, 0.5);
+}
+
+.share-card.theme-sasuke {
+  --theme-accent: #a855f7;
+  background:
+    linear-gradient(90deg, rgba(10, 10, 18, 0.97), rgba(15, 12, 24, 0.92)),
+    radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.2), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(59, 130, 246, 0.16), transparent 25%),
+    #07070f;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(168, 85, 247, 0.35),
+    0 0 45px rgba(168, 85, 247, 0.15);
+}
+.share-card.theme-sasuke .share-card-title,
+.share-card.theme-sasuke .share-card-name-row strong {
+  color: #a855f7;
+  text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+}
+
+.share-card.theme-sakura {
+  --theme-accent: #f472b6;
+  background:
+    linear-gradient(90deg, rgba(16, 12, 14, 0.97), rgba(24, 18, 20, 0.92)),
+    radial-gradient(circle at 10% 20%, rgba(244, 114, 182, 0.18), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(16, 185, 129, 0.14), transparent 25%),
+    #100b0d;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(244, 114, 182, 0.35),
+    0 0 45px rgba(244, 114, 182, 0.15);
+}
+.share-card.theme-sakura .share-card-title,
+.share-card.theme-sakura .share-card-name-row strong {
+  color: #f472b6;
+  text-shadow: 0 0 15px rgba(244, 114, 182, 0.5);
+}
+
+.share-card.theme-kakashi {
+  --theme-accent: #14b8a6;
+  background:
+    linear-gradient(90deg, rgba(12, 18, 20, 0.96), rgba(18, 24, 26, 0.9)),
+    radial-gradient(circle at 10% 20%, rgba(20, 184, 166, 0.18), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(100, 116, 139, 0.18), transparent 25%),
+    #0b1214;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(20, 184, 166, 0.35),
+    0 0 45px rgba(20, 184, 166, 0.15);
+}
+.share-card.theme-kakashi .share-card-title,
+.share-card.theme-kakashi .share-card-name-row strong {
+  color: #14b8a6;
+  text-shadow: 0 0 15px rgba(20, 184, 166, 0.5);
+}
+
+.share-card.theme-itachi {
+  --theme-accent: #ef4444;
+  background:
+    linear-gradient(90deg, rgba(10, 5, 5, 0.98), rgba(18, 8, 8, 0.95)),
+    radial-gradient(circle at 10% 20%, rgba(239, 68, 68, 0.22), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(0, 0, 0, 0.5), transparent 25%),
+    #080404;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(239, 68, 68, 0.35),
+    0 0 45px rgba(239, 68, 68, 0.15);
+}
+.share-card.theme-itachi .share-card-title,
+.share-card.theme-itachi .share-card-name-row strong {
+  color: #ef4444;
+  text-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+.share-card.theme-madara {
+  --theme-accent: #6366f1;
+  background:
+    linear-gradient(90deg, rgba(8, 8, 16, 0.98), rgba(12, 12, 24, 0.94)),
+    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.2), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(239, 68, 68, 0.12), transparent 25%),
+    #06060c;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(99, 102, 241, 0.35),
+    0 0 45px rgba(99, 102, 241, 0.15);
+}
+.share-card.theme-madara .share-card-title,
+.share-card.theme-madara .share-card-name-row strong {
+  color: #6366f1;
+  text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
+}
+
+.share-card.theme-minato {
+  --theme-accent: #eab308;
+  background:
+    linear-gradient(90deg, rgba(14, 14, 10, 0.97), rgba(22, 22, 15, 0.93)),
+    radial-gradient(circle at 10% 20%, rgba(234, 179, 8, 0.2), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(59, 130, 246, 0.16), transparent 25%),
+    #0d0d09;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(234, 179, 8, 0.35),
+    0 0 45px rgba(234, 179, 8, 0.15);
+}
+.share-card.theme-minato .share-card-title,
+.share-card.theme-minato .share-card-name-row strong {
+  color: #eab308;
+  text-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
+}
+
+.share-card.theme-gaara {
+  --theme-accent: #d97706;
+  background:
+    linear-gradient(90deg, rgba(16, 12, 8, 0.97), rgba(24, 18, 12, 0.93)),
+    radial-gradient(circle at 10% 20%, rgba(217, 119, 6, 0.18), transparent 35%),
+    radial-gradient(circle at 88% 16%, rgba(185, 28, 28, 0.12), transparent 25%),
+    #100c08;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(217, 119, 6, 0.35),
+    0 0 45px rgba(217, 119, 6, 0.15);
+}
+.share-card.theme-gaara .share-card-title,
+.share-card.theme-gaara .share-card-name-row strong {
+  color: #d97706;
+  text-shadow: 0 0 15px rgba(217, 119, 6, 0.5);
+}
+
+.share-card.theme-naruto .share-card-grid section,
+.share-card.theme-sasuke .share-card-grid section,
+.share-card.theme-sakura .share-card-grid section,
+.share-card.theme-kakashi .share-card-grid section,
+.share-card.theme-itachi .share-card-grid section,
+.share-card.theme-madara .share-card-grid section,
+.share-card.theme-minato .share-card-grid section,
+.share-card.theme-gaara .share-card-grid section {
+  background: rgba(12, 18, 24, 0.88);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4071,3 +4543,4 @@ small,
     transition-duration: 1ms !important;
   }
 }
+
