@@ -1042,9 +1042,9 @@ export const GENERAL_SKILLS: GeneralSkill[] = [
     ],
   },
   {
-    id: 'urashi',
-    name: 'Kuchiyose: Urashi',
-    description: 'Invoca o cão ninja rastreador Urashi. Com seu faro apurado, ele localiza e expõe a posição exata do inimigo, marcando sua localização em tempo real no mapa.',
+    id: 'urushi',
+    name: 'Kuchiyose: Urushi',
+    description: 'Invoca o cão ninja rastreador Urushi. Com seu faro apurado, ele localiza e expõe a posição exata do inimigo, marcando sua localização em tempo real no mapa.',
     imageSrc: '/images/basics/urashi.webp',
     effects: [
       {
