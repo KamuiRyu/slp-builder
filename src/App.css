@@ -5596,8 +5596,38 @@ small,
 
 .share-skill-list {
   display: grid !important;
-  grid-template-columns: 1fr !important;
-  gap: 12px !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.share-skill {
+  height: 94px !important;
+  padding: 10px 14px !important;
+  gap: 10px !important;
+  grid-template-columns: 50px minmax(0, 1fr) !important;
+}
+
+.share-skill-image-wrap {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+.share-skill-image-ring {
+  width: 46px !important;
+  height: 46px !important;
+}
+
+.share-skill img {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.share-skill strong {
+  font-size: 14px !important;
+}
+
+.share-skill-damage b {
+  font-size: 18px !important;
 }
 
 /* Character Specific Watermark Filters Re-applied for Dynamic Themes */
