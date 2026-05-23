@@ -30,6 +30,7 @@ import type { Equipment, EquipmentType } from '../types/equipment'
 import type { SavedBuild } from '../utils/localBuilds'
 import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
+import { NINJA_AVATARS, DEFAULT_AVATAR_IMAGE } from '../config/avatars'
 
 type BuildLibraryProps = {
   build: Build
@@ -117,6 +118,7 @@ export function BuildLibrary({
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [activeCardTheme, setActiveCardTheme] = useState('dark')
+  const [selectedAvatarId, setSelectedAvatarId] = useState(NINJA_AVATARS[0].id)
   const [toast, setToast] = useState<{
     title: string
     description: string
@@ -428,6 +430,30 @@ export function BuildLibrary({
               </div>
             </div>
 
+            <div className="theme-selector-bar">
+              <span className="theme-selector-label">Foto:</span>
+              <div className="theme-tabs avatars-tabs">
+                {NINJA_AVATARS.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    type="button"
+                    className={`theme-tab-btn avatar-tab-btn ${selectedAvatarId === avatar.id ? 'active' : ''}`}
+                    onClick={() => setSelectedAvatarId(avatar.id)}
+                  >
+                    <img
+                      className="avatar-mini-preview"
+                      src={getPublicAssetUrl(avatar.imageSrc)}
+                      alt={avatar.name}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
+                      }}
+                    />
+                    {avatar.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="share-card-stage" ref={stageRef}>
               <div
                 className="share-card-scaler"
@@ -461,6 +487,7 @@ export function BuildLibrary({
                     cardRef={shareCardRef}
                     theme={activeCardTheme}
                     ranks={ranks}
+                    avatarImgSrc={NINJA_AVATARS.find((a) => a.id === selectedAvatarId)?.imageSrc}
                   />
                 </div>
               </div>
@@ -519,6 +546,7 @@ type BuildShareCardProps = {
   lineages: Lineage[]
   theme: string
   ranks: Array<{ id: string; name: string }>
+  avatarImgSrc?: string
 }
 
 function BuildShareCard({
@@ -531,6 +559,7 @@ function BuildShareCard({
   lineages,
   theme,
   ranks,
+  avatarImgSrc,
 }: BuildShareCardProps) {
   const lineage = lineages.find((item) => item.id === build.lineageId)
   const element = elements.find((item) => item.id === build.elementIds[0])
@@ -568,6 +597,20 @@ function BuildShareCard({
       <div className="share-card-header">
         <BrandLogo />
         <div className="share-card-meta">
+          {avatarImgSrc && (
+            <div className="share-hud-avatar-wrap">
+              <div className="share-hud-avatar-frame">
+                <img
+                  className="share-hud-avatar-img"
+                  alt="Avatar"
+                  src={getPublicAssetUrl(avatarImgSrc)}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
+                  }}
+                />
+              </div>
+            </div>
+          )}
           <div className="share-card-name-block">
             <div className="share-card-name-row">
               <strong>{build.name || 'Shinobi sem nome'}</strong>
