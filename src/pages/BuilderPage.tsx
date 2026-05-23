@@ -106,7 +106,7 @@ function normalizeBuild(build: LegacyPersistedBuild): Build {
 export function BuilderPage() {
   const appBackgroundStyle = {
     '--app-background-image': `url("${getPublicAssetUrl(
-      '/images/background.png',
+      '/images/background.webp',
     )}")`,
   } as CSSProperties
 

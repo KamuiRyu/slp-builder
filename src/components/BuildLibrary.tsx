@@ -68,7 +68,7 @@ const THEME_PALETTE = [
   '#A1887F', '#8D6E63', '#6D4C41', '#4E342E', '#90A4AE', '#607D8B', '#424242'
 ]
 
-const DEFAULT_AVATAR_IMAGE = '/images/elementals/unknown.png'
+const DEFAULT_AVATAR_IMAGE = '/images/elementals/unknown.webp'
 
 const equipmentSlots: Array<{
   field: keyof Build['equipments']
@@ -82,7 +82,7 @@ const equipmentSlots: Array<{
     { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
   ]
 
-const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
+const UNKNOWN_IMAGE = '/images/elementals/unknown.webp'
 
 const SKILL_ATTRIBUTE_COLORS: Record<string, string> = {
   taijutsu: '#ff4d5f',

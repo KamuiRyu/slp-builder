@@ -9,7 +9,7 @@ import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
 import { calculateDistributedPoints } from '../utils/stats'
 
-const UNKNOWN_SKILL_IMAGE = '/images/elementals/unknown.png'
+const UNKNOWN_SKILL_IMAGE = '/images/elementals/unknown.webp'
 
 const effectTypeLabels: Record<SkillEffect['type'], string> = {
   buff: 'Buff',

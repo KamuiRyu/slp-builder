@@ -63,7 +63,7 @@ const equipmentSlots: Array<{
 
 const DIGITS_ONLY_REGEX = /\D/g
 const EMPTY_SELECT_VALUE = '__none__'
-const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
+const UNKNOWN_IMAGE = '/images/elementals/unknown.webp'
 
 function clampNumericValue(rawValue: string, max: number): number {
   const digitsOnly = rawValue.replace(DIGITS_ONLY_REGEX, '')
