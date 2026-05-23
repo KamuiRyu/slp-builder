@@ -978,7 +978,7 @@ export const LINEAGE_BUFF_SKILLS: Record<string, BuffSkill[]> = {
     {
       id: 'sakki',
       name: 'Sakki',
-      imageSrc: '/images/elementals/unknown.png',
+      imageSrc: '/images/lineages/momochi-3.png',
       description: 'Aura demoníaca que amplifica a pressão assassina e a técnica de espada.',
       effects: [
         {

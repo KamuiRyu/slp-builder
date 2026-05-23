@@ -4124,6 +4124,32 @@ small,
   .active-skill-toggle {
     padding-right: 0 !important;
   }
+
+  /* Compact Inputs & Selects on Mobile */
+  .ui-input,
+  .ui-select {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 10px 12px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .ui-select-content {
+    min-width: max(220px, var(--radix-select-trigger-width)) !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 280px !important;
+  }
+
+  .ui-select-item {
+    min-height: 40px !important;
+    padding: 6px 10px 6px 30px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .select-option-image {
+    width: 24px !important;
+    height: 24px !important;
+  }
 }
 
 .share-card-stats-hud {
