@@ -44,11 +44,32 @@ export const EQUIPMENTS: Equipment[] = [
     ],
   },*/
   {
+    id: 'hat',
+    name: 'Chapéu',
+    imageSrc: '/images/equipments/hat.png',
+    type: 'equipment',
+  },
+  {
+    id: 'akatsuki-hat',
+    name: 'Chapéu de Akatsuki',
+    imageSrc: '/images/equipments/akatsuki-hat.png',
+    type: 'equipment',
+    stats: { vida: 10, chakra: 10 },
+  },
+
+  {
+    id: 'kage-hat',
+    name: 'Chapéu de Kage',
+    imageSrc: '/images/equipments/kage-hat.png',
+    type: 'equipment',
+    stats: { vida: 50, chakra: 50 },
+  },
+  {
     id: 'chunnin-jacket',
     name: 'Colete Chunnin',
     imageSrc: '/images/equipments/chunnin-jacket.png',
-    type: 'armor',
-    stats: { vida: 10, chakra: 12},
+    type: 'equipment',
+    stats: { vida: 10, chakra: 12 },
   },
 
   {
@@ -58,18 +79,5 @@ export const EQUIPMENTS: Equipment[] = [
     type: 'accessory',
     stats: { vida: 5, chakra: 3 },
   },
-  {
-    id: 'akatsuki-hat',
-    name: 'Chapéu de Akatsuki',
-    imageSrc: '/images/equipments/akatsuki-hat.png',
-    type: 'accessory',
-    stats: { vida: 10, chakra: 10 },
-  },
-  {
-    id: 'kage-hat',
-    name: 'Chapéu de Kage',
-    imageSrc: '/images/equipments/kage-hat.png',
-    type: 'accessory',
-    stats: { vida: 50, chakra: 50 },
-  },
+
 ]

@@ -4,13 +4,18 @@ export type Build = {
   name: string
   rankId: string
   lineageId: string
+  avatarId?: string
+  avatarImageIndex?: number
+  avatarUrl?: string
+  customThemeColor?: string
   elementIds: [string, string?]
   attributes: Attributes
   training: TrainingAttributes
   equipments: {
     weaponId?: string
-    armorId?: string
-    accessoryId?: string
+    equipment1Id?: string
+    equipment2Id?: string
+    bandanaId?: string
     ninjaToolId?: string
   }
   selectedSkills: {

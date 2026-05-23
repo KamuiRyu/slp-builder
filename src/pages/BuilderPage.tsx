@@ -35,6 +35,8 @@ const DEFAULT_BUILD: Build = {
   name: 'Novo shinobi',
   rankId: NINJA_RANKS[0].id,
   lineageId: LINEAGES[0].id,
+  avatarId: 'random',
+  avatarImageIndex: 0,
   elementIds: [ELEMENTS[0].id],
   attributes: INITIAL_ATTRIBUTE_POINTS,
   training: INITIAL_TRAINING_POINTS,
@@ -85,7 +87,11 @@ function normalizeBuild(build: LegacyPersistedBuild): Build {
       ...build.training,
     },
     equipments: {
-      ...build.equipments,
+      weaponId: build.equipments?.weaponId,
+      equipment1Id: build.equipments?.equipment1Id ?? (build.equipments as any)?.armorId,
+      equipment2Id: build.equipments?.equipment2Id,
+      bandanaId: build.equipments?.bandanaId ?? (build.equipments as any)?.accessoryId,
+      ninjaToolId: build.equipments?.ninjaToolId,
     },
     selectedSkills: {
       ...DEFAULT_BUILD.selectedSkills,
@@ -233,6 +239,13 @@ export function BuilderPage() {
         onDeleteBuild={deleteSavedBuild}
         onLoadBuild={loadSavedBuild}
         onSaveBuild={saveCurrentBuild}
+        onUpdateBuild={(field, value) =>
+          form.setValue(field, value, {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true,
+          })
+        }
         ranks={NINJA_RANKS}
         savedBuilds={savedBuilds}
       />

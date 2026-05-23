@@ -1,16 +1,18 @@
 import type { Build } from '../types/build'
 
 type CompactBuild = [
-  version: 2,
+  version: 2 | 3 | 4,
   name: string,
   rankId: string,
   lineageId: string,
   elementIds: [string, string?],
   attributes: [number, number, number, number, number, number],
   training: [number, number, number, number],
-  equipments: [string?, string?, string?, string?],
+  equipments: Array<string | undefined>,
   selectedSkills: [string[], string[], string[]],
   skillLevels: Record<string, number>,
+  avatarId?: string,
+  avatarImageIndex?: number,
 ]
 
 function encodeBase64Url(json: string): string {
@@ -37,7 +39,7 @@ function decodeBase64(encoded: string): string {
 
 function compactBuild(build: Build): CompactBuild {
   return [
-    2,
+    4,
     build.name,
     build.rankId,
     build.lineageId,
@@ -58,8 +60,9 @@ function compactBuild(build: Build): CompactBuild {
     ],
     [
       build.equipments.weaponId,
-      build.equipments.armorId,
-      build.equipments.accessoryId,
+      build.equipments.equipment1Id,
+      build.equipments.equipment2Id,
+      build.equipments.bandanaId,
       build.equipments.ninjaToolId,
     ],
     [
@@ -68,12 +71,14 @@ function compactBuild(build: Build): CompactBuild {
       build.selectedSkills.buffSkillIds,
     ],
     build.skillLevels,
+    build.avatarId,
+    build.avatarImageIndex,
   ]
 }
 
 function expandBuild(compact: CompactBuild): Build {
   const [
-    ,
+    version,
     name,
     rankId,
     lineageId,
@@ -83,12 +88,30 @@ function expandBuild(compact: CompactBuild): Build {
     equipments,
     selectedSkills,
     skillLevels,
+    avatarId,
+    avatarImageIndex,
   ] = compact
+
+  const expandedEquipments = version >= 3 ? {
+    weaponId: equipments[0],
+    equipment1Id: equipments[1],
+    equipment2Id: equipments[2],
+    bandanaId: equipments[3],
+    ninjaToolId: equipments[4],
+  } : {
+    weaponId: equipments[0],
+    equipment1Id: equipments[1],
+    equipment2Id: undefined,
+    bandanaId: equipments[2],
+    ninjaToolId: equipments[3],
+  }
 
   return {
     name,
     rankId,
     lineageId,
+    avatarId: version >= 4 ? avatarId : 'random',
+    avatarImageIndex: version >= 4 ? avatarImageIndex : 0,
     elementIds,
     attributes: {
       vida: attributes[0],
@@ -104,12 +127,7 @@ function expandBuild(compact: CompactBuild): Build {
       genjutsu: training[2],
       kenjutsu: training[3],
     },
-    equipments: {
-      weaponId: equipments[0],
-      armorId: equipments[1],
-      accessoryId: equipments[2],
-      ninjaToolId: equipments[3],
-    },
+    equipments: expandedEquipments,
     selectedSkills: {
       lineageSkillIds: selectedSkills[0],
       elementalSkillIds: selectedSkills[1],
@@ -120,7 +138,7 @@ function expandBuild(compact: CompactBuild): Build {
 }
 
 function isCompactBuild(value: unknown): value is CompactBuild {
-  return Array.isArray(value) && value[0] === 2
+  return Array.isArray(value) && (value[0] === 2 || value[0] === 3 || value[0] === 4)
 }
 
 export function encodeBuild(build: Build): string {

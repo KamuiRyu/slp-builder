@@ -51,19 +51,14 @@ export function calculateFinalStats(
     stats[attribute] += build.training[attribute]
   }
 
-  const selectedEquipmentIds = Object.values(build.equipments).filter(Boolean)
-  const selectedEquipments = equipments.filter((equipment) =>
-    selectedEquipmentIds.includes(equipment.id),
-  )
-
-  for (const equipment of selectedEquipments) {
-    if (!equipment.stats) {
-      continue
-    }
-
-    for (const [attribute, value] of Object.entries(equipment.stats)) {
-      const key = attribute as keyof Attributes
-      stats[key] += convertAttributePointsToStat(key, value ?? 0)
+  const selectedEquipmentIds = Object.values(build.equipments).filter((id): id is string => Boolean(id))
+  for (const eqId of selectedEquipmentIds) {
+    const equipment = equipments.find((eq) => eq.id === eqId)
+    if (equipment?.stats) {
+      for (const [attribute, value] of Object.entries(equipment.stats)) {
+        const key = attribute as keyof Attributes
+        stats[key] += convertAttributePointsToStat(key, value ?? 0)
+      }
     }
   }
 

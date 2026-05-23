@@ -12,9 +12,14 @@ import {
   AlertCircle,
   Info,
   Share2,
+  ImageIcon,
+  Plus,
+  Palette,
+  Check,
 } from 'lucide-react'
+import Cropper from 'react-easy-crop'
 import { toPng } from 'html-to-image'
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useEffect, useRef, useState, useCallback, type CSSProperties, type RefObject } from 'react'
 import { BrandLogo } from './BrandLogo'
 import {
   ATTRIBUTE_LABELS,
@@ -30,7 +35,6 @@ import type { Equipment, EquipmentType } from '../types/equipment'
 import type { SavedBuild } from '../utils/localBuilds'
 import { getPublicAssetUrl } from '../utils/assets'
 import { calculateDamage } from '../utils/damage'
-import { convertAttributePointsToStat } from '../utils/stats'
 
 type BuildLibraryProps = {
   build: Build
@@ -46,23 +50,36 @@ type BuildLibraryProps = {
   onDeleteBuild: (buildId: string) => void
   onLoadBuild: (build: Build) => void
   onSaveBuild: () => void
+  onUpdateBuild: (field: any, value: any) => void
 }
 
-const equipmentLabels: Record<EquipmentType, string> = {
-  weapon: 'Arma',
-  armor: 'Armadura',
-  accessory: 'Acessório',
-  ninjaTool: 'Ferramenta ninja',
-}
+const THEME_PALETTE = [
+  // Oranges & Yellows (Naruto/Minato/Sun)
+  '#FF9800', '#F57C00', '#EF6C00', '#FFB74D', '#FDD835', '#FFEB3B', '#FFEE58',
+  // Blues (Uchiha/Water/Moon)
+  '#4A90E2', '#1976D2', '#1565C0', '#03A9F4', '#00BCD4', '#80DEEA', '#2196F3',
+  // Reds & Pinks (Akatsuki/Sakura/Will)
+  '#D32F2F', '#C62828', '#B71C1C', '#E53935', '#F06292', '#EC407A', '#F48FB1',
+  // Greens (Lee/Wood/Nature)
+  '#4CAF50', '#388E3C', '#2E7D32', '#1B5E20', '#8BC34A', '#CDDC39', '#AED581',
+  // Purples & Violets (Sound/Rinnegan/Spirit)
+  '#7B1FA2', '#6A1B9A', '#4A148C', '#9C27B0', '#9575CD', '#7E57C2', '#B39DDB',
+  // Browns & Grays (Sand/Earth/Cloud/Steel)
+  '#A1887F', '#8D6E63', '#6D4C41', '#4E342E', '#90A4AE', '#607D8B', '#424242'
+]
 
-const equipmentFields: Array<{
-  type: EquipmentType
+const DEFAULT_AVATAR_IMAGE = '/images/elementals/unknown.png'
+
+const equipmentSlots: Array<{
   field: keyof Build['equipments']
+  label: string
+  type: EquipmentType
 }> = [
-    { type: 'weapon', field: 'weaponId' },
-    { type: 'armor', field: 'armorId' },
-    { type: 'accessory', field: 'accessoryId' },
-    { type: 'ninjaTool', field: 'ninjaToolId' },
+    { field: 'weaponId', label: 'Arma', type: 'weapon' },
+    { field: 'equipment1Id', label: 'Equipamento 1', type: 'equipment' },
+    { field: 'equipment2Id', label: 'Equipamento 2', type: 'equipment' },
+    { field: 'bandanaId', label: 'Bandana', type: 'accessory' },
+    { field: 'ninjaToolId', label: 'Acessório ninja', type: 'ninjaTool' },
   ]
 
 const UNKNOWN_IMAGE = '/images/elementals/unknown.png'
@@ -90,13 +107,6 @@ const MINI_ATTR_LABELS: Record<string, string> = {
   kenjutsu: 'Ken',
 }
 
-const CARD_THEMES = [
-  { id: 'dark', name: 'Dark Forge' },
-  { id: 'scroll', name: 'Pergaminho' },
-  { id: 'akatsuki', name: 'Akatsuki' },
-  { id: 'sage', name: 'Sábio' },
-  { id: 'chakra', name: 'Chakra' },
-]
 
 export function BuildLibrary({
   build,
@@ -112,19 +122,77 @@ export function BuildLibrary({
   onDeleteBuild,
   onLoadBuild,
   onSaveBuild,
+  onUpdateBuild: _onUpdateBuild,
 }: BuildLibraryProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isShareOpen, setIsShareOpen] = useState(false)
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeCardTheme, setActiveCardTheme] = useState('dark')
+
+  // Local state for Share Customization (not persisted in Build)
+  const [customImageUrl, setCustomImageUrl] = useState<string | null>(null)
+  const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null)
+  const [shareThemeColor, setShareThemeColor] = useState(THEME_PALETTE[0])
+  const [isCropping, setIsCropping] = useState(false)
+
+  // Cropper state
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+
+  const onCropComplete = useCallback((_croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }, [])
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = () => {
+        setCustomImageUrl(reader.result as string)
+        setIsCropping(true)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const createCroppedImage = useCallback(async () => {
+    if (!customImageUrl || !croppedAreaPixels) return
+
+    const image = new Image()
+    image.src = customImageUrl
+    await new Promise((resolve) => (image.onload = resolve))
+
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    if (!ctx) return
+
+    canvas.width = croppedAreaPixels.width
+    canvas.height = croppedAreaPixels.height
+
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    )
+
+    setCroppedImageUrl(canvas.toDataURL('image/webp'))
+    setIsCropping(false)
+  }, [customImageUrl, croppedAreaPixels])
+
   const [toast, setToast] = useState<{
     title: string
     description: string
     type?: 'success' | 'info' | 'error' | 'delete'
   } | null>(null)
   const [previewScale, setPreviewScale] = useState(1)
-
   const shareCardRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const toastTimeoutRef = useRef<number | undefined>(undefined)
@@ -413,29 +481,106 @@ export function BuildLibrary({
               </button>
             </div>
 
-            <div className="theme-selector-bar">
-              <span className="theme-selector-label">Tema:</span>
-              <div className="theme-tabs">
-                {CARD_THEMES.map((theme) => (
-                  <button
-                    key={theme.id}
-                    type="button"
-                    className={`theme-tab-btn ${activeCardTheme === theme.id ? 'active' : ''}`}
-                    onClick={() => setActiveCardTheme(theme.id)}
-                  >
-                    {theme.name}
-                  </button>
-                ))}
+            <div className="avatar-selection-sticky-group">
+              <div className="custom-share-controls">
+                <div className="share-control-block">
+                  <div className="variant-header">
+                    <ImageIcon size={14} />
+                    <span>Imagem do Shinobi:</span>
+                  </div>
+                  <div className="image-upload-wrapper">
+                    <label className="image-upload-btn">
+                      <Plus size={20} />
+                      Carregar Foto
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        hidden
+                      />
+                    </label>
+                    {croppedImageUrl && (
+                      <div className="image-uploaded-preview">
+                        <img src={croppedImageUrl} alt="Preview" />
+                        <button 
+                          className="image-clear-btn" 
+                          onClick={() => { setCustomImageUrl(null); setCroppedImageUrl(null); }}
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="share-control-block">
+                  <div className="variant-header">
+                    <Palette size={14} />
+                    <span>Cor do Tema:</span>
+                  </div>
+                  <div className="color-palette-grid">
+                    {THEME_PALETTE.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        className={`color-palette-btn ${shareThemeColor === color ? 'active' : ''}`}
+                        style={{ '--palette-color': color } as CSSProperties}
+                        onClick={() => setShareThemeColor(color)}
+                        title={color}
+                      >
+                        {shareThemeColor === color && <Check size={14} />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {isCropping && customImageUrl && (
+              <div className="cropper-modal-overlay">
+                <div className="cropper-modal-content">
+                  <div className="cropper-header">
+                    <h3>Ajustar Imagem</h3>
+                    <button onClick={() => setIsCropping(false)}><X size={20} /></button>
+                  </div>
+                  <div className="cropper-container">
+                    <Cropper
+                      image={customImageUrl}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1} // Hexagon fits in 1:1
+                      onCropChange={setCrop}
+                      onCropComplete={onCropComplete}
+                      onZoomChange={setZoom}
+                    />
+                  </div>
+                  <div className="cropper-footer">
+                    <div className="zoom-control">
+                      <span>Zoom</span>
+                      <input
+                        type="range"
+                        value={zoom}
+                        min={1}
+                        max={3}
+                        step={0.1}
+                        onChange={(e) => setZoom(Number(e.target.value))}
+                      />
+                    </div>
+                    <button className="cropper-confirm-btn" onClick={createCroppedImage}>
+                      Confirmar Corte
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="share-card-stage" ref={stageRef}>
               <div
                 className="share-card-scaler"
                 style={{
                   width: `${1600 * previewScale}px`,
-                  height: `${1120 * previewScale}px`,
-                  overflow: 'hidden',
+                  height: `${1400 * previewScale}px`,
+                  overflow: 'visible',
                   position: 'relative',
                   margin: '0 auto',
                 }}
@@ -444,12 +589,10 @@ export function BuildLibrary({
                   className="share-card-wrapper"
                   style={{
                     width: '1600px',
-                    height: '1120px',
+                    height: '1400px',
                     transform: `scale(${previewScale})`,
                     transformOrigin: 'top left',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
+                    position: 'relative',
                   }}
                 >
                   <BuildShareCard
@@ -460,8 +603,9 @@ export function BuildLibrary({
                     finalStats={finalStats}
                     lineages={lineages}
                     cardRef={shareCardRef}
-                    theme={activeCardTheme}
+                    theme={shareThemeColor}
                     ranks={ranks}
+                    avatarImgSrc={croppedImageUrl || DEFAULT_AVATAR_IMAGE}
                   />
                 </div>
               </div>
@@ -520,6 +664,7 @@ type BuildShareCardProps = {
   lineages: Lineage[]
   theme: string
   ranks: Array<{ id: string; name: string }>
+  avatarImgSrc?: string
 }
 
 function BuildShareCard({
@@ -532,24 +677,26 @@ function BuildShareCard({
   lineages,
   theme,
   ranks,
+  avatarImgSrc,
 }: BuildShareCardProps) {
   const lineage = lineages.find((item) => item.id === build.lineageId)
   const element = elements.find((item) => item.id === build.elementIds[0])
   const rank = ranks.find((item) => item.id === build.rankId)
-  const selectedEquipments = equipmentFields.map(({ type, field }) => ({
+  const selectedEquipments = equipmentSlots.map(({ field, label, type }) => ({
     type,
-    label: equipmentLabels[type],
+    label,
     equipment: equipments.find((item) => item.id === build.equipments[field]),
   }))
-  const equipmentBonuses = equipments
-    .filter((equipment) =>
-      Object.values(build.equipments).includes(equipment.id),
-    )
+  const equipmentBonuses = Object.values(build.equipments)
+    .filter((id): id is string => Boolean(id))
     .reduce(
-      (bonuses, equipment) => {
-        for (const [attribute, value] of Object.entries(equipment.stats ?? {})) {
-          const key = attribute as AttributeKey
-          bonuses[key] += convertAttributePointsToStat(key, value ?? 0)
+      (bonuses, id) => {
+        const equipment = equipments.find((e) => e.id === id)
+        if (equipment?.stats) {
+          for (const [attribute, value] of Object.entries(equipment.stats)) {
+            const key = attribute as AttributeKey
+            bonuses[key] += value ?? 0
+          }
         }
 
         return bonuses
@@ -564,18 +711,75 @@ function BuildShareCard({
       } satisfies Record<AttributeKey, number>,
     )
   const shareSkills = damageSkillGroups.flatMap((group) => group.skills)
+
+  function hexToRgb(hex: string) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    return result
+      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+      : '255, 215, 71'
+  }
+
+  const activeAvatarThemeColor = theme.startsWith('#') ? theme : '#ffd747'
+
   return (
-    <div className={`share-card theme-${theme}`} ref={cardRef}>
-      <div className="share-card-header">
+    <div
+      className="share-card"
+      ref={cardRef}
+      style={{
+        '--theme-accent': activeAvatarThemeColor,
+        '--theme-accent-rgb': hexToRgb(activeAvatarThemeColor)
+      } as CSSProperties}
+    >
+      <div className="share-card-bg-logo">
         <BrandLogo />
+      </div>
+      <div className="share-card-header">
         <div className="share-card-meta">
+          {avatarImgSrc && (
+            <div className="share-hud-avatar-wrap">
+              <div className="share-hud-avatar-frame">
+                <img
+                  className="share-hud-avatar-img"
+                  alt="Avatar"
+                  src={getPublicAssetUrl(avatarImgSrc)}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = getPublicAssetUrl(DEFAULT_AVATAR_IMAGE)
+                  }}
+                />
+              </div>
+              {lineage?.imageSrc && (
+                <div className="share-hud-badge lineage-badge" title={`Linhagem: ${lineage.name}`}>
+                  <img src={getPublicAssetUrl(lineage.imageSrc)} alt={lineage.name} />
+                </div>
+              )}
+              {element?.imageSrc && (
+                <div className="share-hud-badge element-badge" title={`Elemento: ${element.name}`}>
+                  <img src={getPublicAssetUrl(element.imageSrc)} alt={element.name} />
+                </div>
+              )}
+            </div>
+          )}
           <div className="share-card-name-block">
             <div className="share-card-name-row">
               <strong>{build.name || 'Shinobi sem nome'}</strong>
-              <ShareImage imageSrc={lineage?.imageSrc} label="Linhagem" />
-              <ShareImage imageSrc={element?.imageSrc} label="Elemento" />
             </div>
             <span className="share-card-rank">{rank?.name ?? 'Graduação'}</span>
+            <div className="share-card-stats-hud">
+              <div className="share-hud-bar hp-bar">
+                <span className="hud-label">HP</span>
+                <div className="hud-track">
+                  <div className="hud-fill" style={{ width: `${Math.min(100, (finalStats.vida / 4000) * 100)}%` }} />
+                </div>
+                <span className="hud-value">{finalStats.vida}</span>
+              </div>
+              <div className="share-hud-bar cp-bar">
+                <span className="hud-label">CP</span>
+                <div className="hud-track">
+                  <div className="hud-fill" style={{ width: `${Math.min(100, (finalStats.chakra / 3000) * 100)}%` }} />
+                </div>
+                <span className="hud-value">{finalStats.chakra}</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="share-radar-card">
@@ -989,15 +1193,3 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
   )
 }
 
-type ShareImageProps = {
-  imageSrc?: string
-  label: string
-}
-
-function ShareImage({ imageSrc, label }: ShareImageProps) {
-  return (
-    <div className="share-origin-image" title={label}>
-      <img alt={label} src={getPublicAssetUrl(imageSrc ?? UNKNOWN_IMAGE)} />
-    </div>
-  )
-}
