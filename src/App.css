@@ -1704,6 +1704,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .share-card-name-row {
@@ -1711,14 +1713,21 @@
   align-items: center;
   gap: 20px;
   flex-wrap: nowrap;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .share-card-name-row strong {
   color: var(--text-strong);
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 48px;
   font-weight: 950;
   text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   letter-spacing: 0.02em;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
 }
@@ -5055,6 +5064,7 @@ small,
   align-items: center !important;
   gap: 40px !important;
   flex: 1 !important;
+  min-width: 0 !important;
 }
 
 .share-hud-avatar-wrap {
@@ -5073,11 +5083,18 @@ small,
   flex-direction: column !important;
   justify-content: center !important;
   gap: 12px !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 240px) !important;
 }
 
 .share-card-name-row strong {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
   font-size: 72px !important;
   line-height: 1 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 .share-radar-card {

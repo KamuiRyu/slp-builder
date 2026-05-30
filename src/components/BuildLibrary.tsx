@@ -770,7 +770,7 @@ function BuildShareCard({
           )}
           <div className="share-card-name-block">
             <div className="share-card-name-row">
-              <strong>{build.name || 'Shinobi sem nome'}</strong>
+              <strong title={build.name || 'Shinobi sem nome'}>{build.name || 'Shinobi sem nome'}</strong>
             </div>
             <span className="share-card-rank">{rank?.name ?? 'Graduação'}</span>
             <div className="share-card-stats-hud">
@@ -1205,4 +1205,3 @@ function ShareAttributeRadar({ points, training }: ShareAttributeRadarProps) {
     </div>
   )
 }
-
